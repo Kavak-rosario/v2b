@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero V2B — Kavak</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --kv-green:#3CE08B;
+  --kv-green-dark:#1EB86A;
+  --kv-green-text:#0A6638;
+  --kv-green-bg:#E8FBF1;
+  --kv-green-bg2:#D0F5E3;
+  --bg:#F5F5F5;
+  --surface:#FFFFFF;
+  --surface2:#F9F9F9;
+  --border:#E8E8E8;
+  --border2:#D0D0D0;
+  --text1:#1A1A1A;
+  --text2:#666666;
+  --text3:#999999;
+  --blue:#2563EB;
+  --blue-bg:#EFF6FF;
+  --blue-text:#1E40AF;
+  --amber:#D97706;
+  --amber-bg:#FFFBEB;
+  --red:#DC2626;
+  --red-bg:#FEF2F2;
+  --orange:#EA580C;
+  --orange-bg:#FFF7ED;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text1);padding:0;font-size:14px;line-height:1.5}
+
+.kv-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.kv-logo{font-size:22px;font-weight:700;color:var(--text1);letter-spacing:-.03em;display:flex;align-items:center;gap:8px}
+.kv-logo-dot{width:8px;height:8px;border-radius:50%;background:var(--kv-green);display:inline-block}
+.kv-badge{font-size:11px;font-weight:600;background:var(--kv-green-bg);color:var(--kv-green-text);border-radius:99px;padding:3px 10px}
+
+.kv-wrap{padding:1.75rem 2rem 3rem}
+
+.nav{display:flex;gap:0;margin-bottom:1.75rem;border-bottom:1px solid var(--border);background:var(--surface);margin-left:-2rem;margin-right:-2rem;padding:0 2rem}
+.nav-tab{padding:14px 20px;font-size:13px;font-weight:500;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;letter-spacing:.01em;transition:color .15s}
+.nav-tab.on{color:var(--text1);border-bottom-color:var(--kv-green);font-weight:700}
+.nav-tab:hover:not(.on){color:var(--text2)}
+.page{display:none}.page.on{display:block}
+
+.topbar-row{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:1.25rem;margin-bottom:1.75rem;border-bottom:1px solid var(--border)}
+h1{font-size:24px;font-weight:700;color:var(--text1);letter-spacing:-.02em}
+.sub{font-size:13px;color:var(--text3);margin-top:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px}
+.ct{background:var(--kv-green-bg);color:var(--kv-green-text)}
+.cp{background:var(--blue-bg);color:var(--blue-text)}
+.ca{background:var(--amber-bg);color:var(--amber)}
+
+.upload-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--text2);border:1.5px solid var(--border2);border-radius:8px;background:var(--surface);cursor:pointer;white-space:nowrap;transition:all .15s}
+.upload-btn:hover{color:var(--kv-green-text);border-color:var(--kv-green);background:var(--kv-green-bg)}
+.upload-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:1.75rem;box-shadow:var(--shadow-sm)}
+.upload-panel label{font-size:11px;font-weight:700;color:var(--text3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+textarea.up-ta{width:100%;height:85px;font-size:12px;font-family:monospace;border:1px solid var(--border);border-radius:8px;padding:8px;resize:vertical;background:var(--surface2);color:var(--text1)}
+.hint{font-size:11px;color:var(--text3);margin-top:5px}
+.btns{display:flex;gap:8px;margin-top:10px}
+button.btn{padding:8px 16px;font-size:12px;font-weight:600;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text1);cursor:pointer;font-family:inherit;transition:all .15s}
+button.btn:hover{background:var(--surface2)}
+button.btn-g{background:var(--kv-green);color:var(--kv-green-text);border-color:var(--kv-green);font-weight:700}
+button.btn-g:hover{background:var(--kv-green-dark)}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:1.5rem}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.1rem 1.25rem;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kv-green)}
+.kpi-lbl{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.kpi-val{font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.kpi-sub{font-size:12px;color:var(--text3);margin-top:5px}
+
+.prog-wrap{margin-bottom:1.5rem}
+.prog-lbl{display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:8px;font-weight:600}
+.prog-bg{height:8px;background:var(--border);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:var(--kv-green);border-radius:99px;transition:width .4s ease}
+
+.filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:1.1rem}
+.filters span{font-size:12px;color:var(--text3);font-weight:600}
+.fbtn{padding:6px 16px;font-size:12px;font-weight:600;border:1.5px solid var(--border);border-radius:99px;cursor:pointer;background:var(--surface);color:var(--text2);font-family:inherit;transition:all .15s}
+.fbtn.on{background:var(--text1);color:#fff;border-color:var(--text1)}
+.fbtn:hover:not(.on){border-color:var(--kv-green);color:var(--kv-green-text);background:var(--kv-green-bg)}
+
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.rt{width:100%;border-collapse:collapse;font-size:13px}
+.rt th{text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--surface2);white-space:nowrap}
+.rt td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text1)}
+.rt tr:last-child td{border-bottom:none}
+.rt tr:hover td{background:#F9FDF9}
+.rt tr.ok td{background:var(--kv-green-bg)}
+.rt tr.ok:hover td{background:var(--kv-green-bg2)}
+
+.ck{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border2);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.ck:hover{border-color:var(--kv-green);background:var(--kv-green-bg)}
+.ck.on{background:var(--kv-green);border-color:var(--kv-green)}
+.ck .ico{font-size:13px;color:var(--kv-green-text);display:none;font-weight:700}
+.ck.on .ico{display:block}
+.quien-llamo{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--kv-green-text);background:var(--kv-green-bg);border-radius:6px;padding:3px 9px;white-space:nowrap}
+
+.ci{width:100%;font-size:12px;border:1px solid transparent;border-radius:8px;padding:5px 8px;background:transparent;color:var(--text1);resize:none;min-height:28px;max-height:66px;font-family:inherit}
+.ci:focus{outline:none;border-color:var(--kv-green);background:var(--kv-green-bg)}
+.ci::placeholder{color:var(--border2)}
+
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700}
+.bc{background:var(--kv-green-bg);color:var(--kv-green-text)}
+.bo{background:var(--blue-bg);color:var(--blue-text)}
+.tel{color:var(--blue);text-decoration:none;font-family:monospace;font-size:12px;font-weight:500}
+.tel:hover{color:var(--kv-green-dark);text-decoration:underline}
+.kname{font-size:12px;font-weight:600;color:var(--text1)}
+.mot-tag{display:inline-block;font-size:11px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{text-align:center;padding:4rem 1rem;color:var(--text3);font-size:14px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.35rem;margin-bottom:1.35rem;box-shadow:var(--shadow-sm)}
+.sec-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+
+.m-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;user-select:none}
+.m-row:last-child{border-bottom:none}
+.m-name{flex:1;color:var(--text1);font-weight:500}
+.m-bar-bg{width:64px;height:5px;background:var(--border);border-radius:99px;overflow:hidden;flex-shrink:0}
+.m-bar-f{height:100%;border-radius:99px}
+.mf-c{background:var(--kv-green)}
+.mf-o{background:var(--blue)}
+.m-pct{font-size:12px;font-weight:700;min-width:38px;text-align:right;flex-shrink:0}
+.m-cnt{font-size:11px;color:var(--text3);min-width:20px;text-align:right}
+.m-chevron{font-size:12px;color:var(--border2);margin-left:4px;flex-shrink:0;transition:transform .2s}
+.m-row:hover .m-name{color:var(--kv-green-dark)}
+.m-row:hover .m-chevron{color:var(--kv-green)}
+.m-row.open .m-chevron{transform:rotate(90deg);color:var(--kv-green)}
+.motivos-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.m-sec{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
+.m-detail{display:none;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-top:3px;margin-bottom:5px}
+.m-detail.open{display:block}
+.m-detail-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.m-detail-row:last-child{border-bottom:none}
+.m-detail-nombre{font-weight:700;color:var(--text1);min-width:140px;flex-shrink:0}
+.m-detail-correo{color:var(--text3);font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.m-detail-stock{font-size:11px;font-weight:600;color:var(--blue-text);background:var(--blue-bg);border-radius:6px;padding:2px 8px;flex-shrink:0;white-space:nowrap}
+.m-detail-stock.empty{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+
+.v2b-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:1.75rem}
+.v2b-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.35rem;box-shadow:var(--shadow-sm)}
+.v2b-card-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.v2b-big{font-size:40px;font-weight:700;line-height:1;letter-spacing:-.03em}
+.v2b-desc{font-size:13px;color:var(--text3);margin-top:6px}
+.bar-bg{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:14px}
+.bar-f{height:100%;border-radius:99px}
+
+.tablas-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem}
+.tabla-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.35rem;box-shadow:var(--shadow-sm)}
+.tabla-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.tabla-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.tp-cita{background:var(--kv-green-bg);color:var(--kv-green-text);font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;display:inline-block}
+.tp-org{background:var(--blue-bg);color:var(--blue-text);font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;display:inline-block}
+.rank-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.rank-table th{text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:7px 8px;border-bottom:1px solid var(--border)}
+.rank-table td{padding:8px 8px;border-bottom:1px solid var(--border);color:var(--text1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-table tr:last-child td{border-bottom:none}
+.rank-table tr:hover td{background:var(--surface2)}
+.rank-num{font-size:11px;font-weight:700}
+.rbv{display:inline-flex;align-items:center;gap:5px}
+.rvbadge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.rv-g{background:var(--kv-green-bg);color:var(--kv-green-text)}.rv-a{background:var(--amber-bg);color:var(--amber)}.rv-r{background:var(--red-bg);color:var(--red)}
+.rbar{display:inline-block;width:32px;height:5px;background:var(--border);border-radius:99px;overflow:hidden;vertical-align:middle}
+.rbar-f{height:100%;border-radius:99px}
+.note{font-size:12px;color:var(--text3);padding:8px 0 0;margin-top:10px;border-top:1px solid var(--border)}
+
+.fb-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem}
+.fb-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.35rem;box-shadow:var(--shadow-sm)}
+.fb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.fb-name{font-size:14px;font-weight:700;color:var(--text1)}
+.fb-badges{display:flex;gap:6px;flex-wrap:wrap}
+.fb-motivos{margin-bottom:10px}
+.fb-m{display:flex;align-items:flex-start;gap:7px;padding:4px 0;font-size:12px}
+.fb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.fb-mname{flex:1;color:var(--text2);line-height:1.5}
+.fb-tip{font-size:12px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:9px 11px;border-left:3px solid var(--blue);line-height:1.55}
+.fb-tip.ta{border-left-color:var(--amber)}.fb-tip.tr{border-left-color:var(--red)}
+
+.dias-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px;margin-bottom:1.75rem}
+.dia-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:1.1rem 1.2rem;cursor:pointer;transition:all .18s;position:relative;box-shadow:var(--shadow-sm)}
+.dia-card:hover{border-color:var(--kv-green);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.dia-card.on{border-color:var(--kv-green);background:var(--kv-green-bg)}
+.dia-card.on .dia-fecha,.dia-card.on .dia-v2b{color:var(--kv-green-text)}
+.dia-fecha{font-size:13px;font-weight:700;color:var(--text1);margin-bottom:6px}
+.dia-v2b{font-size:26px;font-weight:700;color:var(--text1);line-height:1;margin-bottom:3px;letter-spacing:-.02em}
+.dia-vsub{font-size:11px;color:var(--text3)}
+.dia-chips{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.dc{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.dcp{background:var(--kv-green-bg);color:var(--kv-green-text)}
+.dca{background:var(--blue-bg);color:var(--blue-text)}
+.dia-ind{width:8px;height:8px;border-radius:50%;position:absolute;top:10px;right:10px}
+.ig{background:var(--kv-green)}.ia{background:#EAB308}.io{background:var(--orange)}.ir{background:var(--red)}
+
+.detalle-panel{display:none}.detalle-panel.on{display:block}
+.det-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.det-titulo{font-size:20px;font-weight:700;color:var(--text1);letter-spacing:-.02em}
+.det-sub{font-size:13px;color:var(--text3);margin-top:4px}
+.btn-back{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2);border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;background:var(--surface);cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-back:hover{border-color:var(--kv-green);color:var(--kv-green-text)}
+.det-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.dk{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.9rem 1.1rem;box-shadow:var(--shadow-sm)}
+.dk-lbl{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.dk-val{font-size:27px;font-weight:700;letter-spacing:-.02em}
+.dk-sub{font-size:12px;color:var(--text3);margin-top:4px}
+.det-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem}
+
+.feed-list{list-style:none}
+.feed-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border-bottom:none}
+.feed-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:1px}
+.feed-body{flex:1}
+.feed-title{font-size:14px;font-weight:700;color:var(--text1);margin-bottom:3px}
+.feed-desc{font-size:13px;color:var(--text2);line-height:1.55}
+.feed-accion{font-size:12px;font-weight:600;color:var(--kv-green-text);background:var(--kv-green-bg);border-radius:6px;padding:4px 10px;margin-top:7px;display:inline-block}
+.feed-tag{font-size:11px;color:var(--text3);margin-top:5px}
+.empty-hist{text-align:center;padding:5rem 1rem;color:var(--text3);font-size:14px;border:1.5px dashed var(--border2);border-radius:20px}
+
+select{font-family:inherit}
+
+@media(max-width:600px){
+  .kv-wrap{padding:1rem 1rem 3rem}
+  .nav{margin-left:-1rem;margin-right:-1rem;padding:0 1rem}
+  .kpi-row,.v2b-cards,.tablas-grid,.motivos-grid,.det-2col,.fb-grid,.det-kpi{grid-template-columns:1fr 1fr}
+  .v2b-cards,.tablas-grid,.fb-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="kv-header">
+  <div class="kv-logo">
+    KAVAK <span class="kv-logo-dot"></span>
+  </div>
+  <span class="kv-badge">Tablero V2B · Rosario</span>
+</header>
+
+<div class="kv-wrap">
+<div class="nav">
+  <button class="nav-tab on"  onclick="sp('resumen',this)">Resumen del día</button>
+  <button class="nav-tab"     onclick="sp('historial',this)">Motivos por día</button>
+  <button class="nav-tab"     onclick="sp('recovery',this)">📞 Recovery</button>
+</div>
+
+<!-- ═══ PÁG 1: RESUMEN ═══ -->
+<div class="page on" id="page-resumen">
+  <div class="topbar-row">
+    <div>
+      <h1>Tablero V2B — Rosario</h1>
+      <p class="sub" id="main-subtitulo">6 – 22 abril 2026 · 152 registros totales</p>
+      <div class="chips" id="main-chips">
+        <span class="chip ct">42 citas sin reserva</span>
+        <span class="chip cp">75 orgánicos</span>
+        <span class="chip ca">35 seguimientos</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <button class="upload-btn" onclick="tog('up1')">⇪ Carga de datos</button>
+      <span id="carga-badge" style="display:none;font-size:10px;color:#085041;background:#E1F5EE;padding:2px 8px;border-radius:99px;font-weight:500"></span>
+    </div>
+  </div>
+  <div id="up1" style="display:none">
+    <div class="upload-panel">
+      <label>Pega los datos del día (desde Google Sheets)</label>
+      <textarea class="up-ta" id="mainInput" placeholder="Fecha	Cliente	Calificación de la visita	Kavako asignado	Apartado	Comentarios apartado	Teléfono&#10;Primera fila = encabezados."></textarea>
+      <div class="hint">Columnas clave: Calificación de la visita · Kavako asignado · Apartado · Comentarios apartado · Teléfono</div>
+      <div class="btns"><button class="btn btn-g" onclick="cargarPrincipal()">Actualizar tablero</button><button class="btn" onclick="tog('up1')">Cerrar</button></div>
+    </div>
+  </div>
+
+  <div class="kpi-row" id="main-kpis">
+    <div class="kpi"><div class="kpi-lbl">V2B general</div><div class="kpi-val" style="color:#1D9E75">32.9%</div><div class="kpi-sub">50 reservas de 152</div></div>
+    <div class="kpi"><div class="kpi-lbl">V2B citas</div><div class="kpi-val" style="color:#3C3489">57.1%</div><div class="kpi-sub">24 de 42 citas</div></div>
+    <div class="kpi"><div class="kpi-lbl">V2B orgánicos</div><div class="kpi-val" style="color:#854F0B">33.3%</div><div class="kpi-sub">25 de 75 orgánicos</div></div>
+    <div class="kpi"><div class="kpi-lbl">No reservaron</div><div class="kpi-val">68</div><div class="kpi-sub">Citas: 18 · Org: 50</div></div>
+  </div>
+
+  <div class="v2b-cards">
+    <div class="v2b-card"><div class="v2b-card-title">V2B general</div><div class="v2b-big" id="v2b-gen-num" style="color:#1D9E75">32.9%</div><div class="v2b-desc" id="v2b-gen-desc">50 de 152 visitas</div><div class="bar-bg"><div class="bar-f" id="v2b-gen-bar" style="width:32.9%;background:#1D9E75"></div></div></div>
+    <div class="v2b-card"><div class="v2b-card-title">V2B citas sin reserva</div><div class="v2b-big" id="v2b-cita-num" style="color:#7F77DD">57.1%</div><div class="v2b-desc" id="v2b-cita-desc">24 de 42 citas</div><div class="bar-bg"><div class="bar-f" id="v2b-cita-bar" style="width:57.1%;background:#7F77DD"></div></div></div>
+    <div class="v2b-card"><div class="v2b-card-title">V2B orgánicos</div><div class="v2b-big" id="v2b-org-num" style="color:#BA7517">33.3%</div><div class="v2b-desc" id="v2b-org-desc">25 de 75 orgánicos</div><div class="bar-bg"><div class="bar-f" id="v2b-org-bar" style="width:33.3%;background:#BA7517"></div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">Motivos de no conversión</div>
+    <div class="motivos-grid">
+      <div>
+        <div class="m-sec">Citas — 18 sin apartar</div>
+        <div class="m-row"><span class="m-name">Sin motivo registrado</span><div class="m-bar-bg"><div class="m-bar-f mf-c" style="width:100%"></div></div><span class="m-pct" style="color:#3C3489">44.4%</span><span class="m-cnt">8</span></div>
+        <div class="m-row"><span class="m-name">En consideración</span><div class="m-bar-bg"><div class="m-bar-f mf-c" style="width:37.5%"></div></div><span class="m-pct" style="color:#3C3489">16.7%</span><span class="m-cnt">3</span></div>
+        <div class="m-row"><span class="m-name">Solo vino a informarse</span><div class="m-bar-bg"><div class="m-bar-f mf-c" style="width:37.5%"></div></div><span class="m-pct" style="color:#3C3489">16.7%</span><span class="m-cnt">3</span></div>
+        <div class="m-row"><span class="m-name">Pospone decisión</span><div class="m-bar-bg"><div class="m-bar-f mf-c" style="width:25%"></div></div><span class="m-pct" style="color:#3C3489">11.1%</span><span class="m-cnt">2</span></div>
+        <div class="m-row"><span class="m-name">Perfil rechazado</span><div class="m-bar-bg"><div class="m-bar-f mf-c" style="width:12.5%"></div></div><span class="m-pct" style="color:#3C3489">5.6%</span><span class="m-cnt">1</span></div>
+        <div class="m-row"><span class="m-name">Condiciones / precio</span><div class="m-bar-bg"><div class="m-bar-f mf-c" style="width:12.5%"></div></div><span class="m-pct" style="color:#3C3489">5.6%</span><span class="m-cnt">1</span></div>
+      </div>
+      <div>
+        <div class="m-sec">Orgánicos — 50 sin apartar</div>
+        <div class="m-row"><span class="m-name">Sin motivo registrado</span><div class="m-bar-bg"><div class="m-bar-f mf-o" style="width:100%"></div></div><span class="m-pct" style="color:#854F0B">50.0%</span><span class="m-cnt">25</span></div>
+        <div class="m-row"><span class="m-name">Sin presupuesto / enganche</span><div class="m-bar-bg"><div class="m-bar-f mf-o" style="width:24%"></div></div><span class="m-pct" style="color:#854F0B">12.0%</span><span class="m-cnt">6</span></div>
+        <div class="m-row"><span class="m-name">Pospone decisión</span><div class="m-bar-bg"><div class="m-bar-f mf-o" style="width:20%"></div></div><span class="m-pct" style="color:#854F0B">10.0%</span><span class="m-cnt">5</span></div>
+        <div class="m-row"><span class="m-name">Solo vino a informarse</span><div class="m-bar-bg"><div class="m-bar-f mf-o" style="width:16%"></div></div><span class="m-pct" style="color:#854F0B">8.0%</span><span class="m-cnt">4</span></div>
+        <div class="m-row"><span class="m-name">Perfil rechazado</span><div class="m-bar-bg"><div class="m-bar-f mf-o" style="width:12%"></div></div><span class="m-pct" style="color:#854F0B">6.0%</span><span class="m-cnt">3</span></div>
+        <div class="m-row"><span class="m-name">Condiciones / precio</span><div class="m-bar-bg"><div class="m-bar-f mf-o" style="width:12%"></div></div><span class="m-pct" style="color:#854F0B">6.0%</span><span class="m-cnt">3</span></div>
+      </div>
+    </div>
+    <div class="note">44-50% sin motivo registrado — campo obligatorio en cada visita no cerrada.</div>
+  </div>
+
+  <div class="tablas-grid">
+    <div class="tabla-wrap">
+      <div class="tabla-header"><div class="tabla-title">Ranking V2B</div><span class="tp-cita">Citas</span></div>
+      <table class="rank-table"><thead><tr><th style="width:8%">#</th><th style="width:44%">Kavako</th><th style="width:10%">Vis.</th><th style="width:10%">Res.</th><th style="width:28%">V2B</th></tr></thead><tbody id="tbody-cita"></tbody></table>
+      <div class="note">Promedio citas: 57.1%</div>
+    </div>
+    <div class="tabla-wrap">
+      <div class="tabla-header"><div class="tabla-title">Ranking V2B</div><span class="tp-org">Orgánicos</span></div>
+      <table class="rank-table"><thead><tr><th style="width:8%">#</th><th style="width:44%">Kavako</th><th style="width:10%">Vis.</th><th style="width:10%">Res.</th><th style="width:28%">V2B</th></tr></thead><tbody id="tbody-org"></tbody></table>
+      <div class="note">Promedio orgánicos: 33.3%</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:10px">
+    <div style="font-size:13px;font-weight:500;margin-bottom:4px">Feedback por onboarder</div>
+    <div style="font-size:12px;color:#888;margin-bottom:14px">Análisis individual y acción sugerida</div>
+  </div>
+  <div class="fb-grid" id="fb-grid"></div>
+</div>
+
+<!-- ═══ PÁG 2: MOTIVOS POR DÍA ═══ -->
+<div class="page" id="page-historial">
+  <div class="topbar-row">
+    <div><h1>Motivos por día</h1><p class="sub">Selecciona un día para ver motivos y feedback</p></div>
+    <span style="font-size:11px;color:#aaa;padding-top:6px">Los datos se jalán automáticamente del Resumen del día</span>
+  </div>
+  <div class="dias-grid" id="dias-grid"></div>
+  <div id="hist-empty" class="empty-hist"><div style="font-size:28px;margin-bottom:8px">📅</div>Aún no hay días cargados.<br><span style="font-size:12px">Carga los datos desde la pestaña <strong>Resumen del día</strong> y aquí aparecerán automáticamente.</span></div>
+  <div class="detalle-panel" id="detalle-panel">
+    <div class="det-header">
+      <div><div class="det-titulo" id="det-titulo"></div><div class="det-sub" id="det-sub"></div></div>
+      <button class="btn-back" onclick="cerrarDetalle()">← Todos los días</button>
+    </div>
+    <div class="det-kpi" id="det-kpi"></div>
+    <div class="det-2col">
+      <div class="card" style="margin-bottom:0"><div class="sec-title">Motivos — Citas <span id="det-cc" class="tp-cita"></span></div><div id="det-mc"></div></div>
+      <div class="card" style="margin-bottom:0"><div class="sec-title">Motivos — Orgánicos <span id="det-oc" class="tp-org"></span></div><div id="det-mo"></div></div>
+    </div>
+    <div class="card" style="margin-top:1.25rem"><div class="sec-title" id="det-feed-title">Feed del día</div><ul class="feed-list" id="det-feed"></ul></div>
+  </div>
+</div>
+
+<!-- ═══ PÁG 3: RECOVERY ═══ -->
+<div class="page" id="page-recovery">
+  <div class="topbar-row">
+    <div><h1>Recovery — Seguimiento de llamadas</h1><p class="sub">Clientes que no reservaron · El kavako asignado debe contactarlos</p></div>
+    <span style="font-size:11px;color:#aaa;padding-top:6px">Los datos se jalán automáticamente del Resumen del día</span>
+  </div>
+
+  <!-- KPIs generales -->
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">Por llamar</div><div class="kpi-val" id="rk-pend" style="color:#EF4444">0</div><div class="kpi-sub">sin contactar</div></div>
+    <div class="kpi"><div class="kpi-lbl">Llamados</div><div class="kpi-val" id="rk-llam" style="color:#1D9E75">0</div><div class="kpi-sub">contactados</div></div>
+    <div class="kpi"><div class="kpi-lbl">Total</div><div class="kpi-val" id="rk-tot">0</div><div class="kpi-sub">en recovery</div></div>
+    <div class="kpi"><div class="kpi-lbl">Avance</div><div class="kpi-val" id="rk-pct" style="color:#1D9E75">0%</div><div class="kpi-sub">completado</div></div>
+  </div>
+
+  <!-- Barra de progreso general -->
+  <div class="prog-wrap">
+    <div class="prog-lbl"><span>Progreso de llamadas</span><span id="prog-txt">0 de 0 contactados</span></div>
+    <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Avance por kavako -->
+  <div class="card" style="margin-bottom:1.35rem">
+    <div class="sec-title" style="margin-bottom:14px">Avance por kavako</div>
+    <div id="rec-kavako-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+      <div style="color:#aaa;font-size:13px">Sin datos aún</div>
+    </div>
+  </div>
+
+  <!-- Filtros tipo + filtro kavako -->
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:1rem">
+    <div class="filters" style="margin-bottom:0">
+      <span>Tipo:</span>
+      <button class="fbtn on" onclick="setF('todos',this)">Todos</button>
+      <button class="fbtn" onclick="setF('pendiente',this)">Por llamar</button>
+      <button class="fbtn" onclick="setF('llamado',this)">Llamados</button>
+      <button class="fbtn" onclick="setF('cita',this)">Citas</button>
+      <button class="fbtn" onclick="setF('organico',this)">Orgánicos</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;color:#8a8fa8;font-weight:500">Kavako:</span>
+      <select id="filtro-kavako" onchange="renderRec()" style="font-size:12px;font-weight:500;border:1px solid #d8dae6;border-radius:8px;padding:5px 10px;background:#fff;color:#1a1a2e;cursor:pointer;font-family:inherit">
+        <option value="">Todos</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tw">
+    <table class="rt">
+      <thead>
+        <tr>
+          <th style="width:13%">Cliente</th>
+          <th style="width:11%">Teléfono</th>
+          <th style="width:6%">Tipo</th>
+          <th style="width:13%">Kavako asignado</th>
+          <th style="width:14%">Llamado por</th>
+          <th style="width:15%">Motivo no reserva</th>
+          <th style="width:22%">Comentarios de llamada</th>
+          <th style="width:6%;text-align:center">✓ Listo</th>
+        </tr>
+      </thead>
+      <tbody id="rec-body"></tbody>
+    </table>
+    <div id="rec-empty" class="empty">
+      <div style="font-size:30px;margin-bottom:10px">📞</div>
+      No hay clientes en recovery todavía.<br>
+      <span style="font-size:12px">Carga los datos del día desde la pestaña <strong>Resumen del día</strong> y aquí aparecerán automáticamente.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATIC DATA ──
+const CITAS_D=[{k:"Oscar Longines",t:8,r:8,v2b:100,nr:[]},{k:"Samuel Rodriguez",t:1,r:1,v2b:100,nr:[]},{k:"Dionicio Luiz",t:3,r:2,v2b:66.7,nr:["No es el titular del financiamiento"]},{k:"Brandon Jarquinmartinez",t:8,r:5,v2b:62.5,nr:["Sin interés: quería coche con temas mecánicos","Sin motivo registrado (1)"]},{k:"Gabriela Sanchez",t:5,r:3,v2b:60,nr:["Sin motivo registrado (2)"]},{k:"Jenifer Hernandez",t:6,r:3,v2b:50,nr:["Sin motivo registrado (3)"]},{k:"Francisco Ramirez",t:5,r:2,v2b:40,nr:["En consideración: checa cotizaciones","En consideración: vuelve mañana","Solo vino a conocer procesos"]},{k:"Sin asignar",t:6,r:0,v2b:0,nr:["6 clientes sin kavako asignado"]}];
+const ORGS_D=[{k:"Jenifer Hernandez",t:7,r:6,v2b:85.7,nr:["Sin motivo (1)"]},{k:"Francisco Ramirez",t:3,r:2,v2b:66.7,nr:["Solo vino a ver opciones (mayo)"]},{k:"Gabriela Sanchez",t:3,r:2,v2b:66.7,nr:["Sin motivo (1)"]},{k:"Ivan Covarrubias",t:2,r:1,v2b:50,nr:["Perfil rechazado"]},{k:"Samuel Rodriguez",t:2,r:1,v2b:50,nr:["Sin presupuesto"]},{k:"Oscar Longines",t:18,r:9,v2b:50,nr:["Sin motivo (5)","Solo a informarse (2)","Condiciones/tasa (1)","En consideración (1)"]},{k:"Brandon Jarquinmartinez",t:11,r:3,v2b:27.3,nr:["Sin motivo (4)","Flag fiscal","Solo a conocer (1)"]},{k:"Dionicio Luiz",t:5,r:1,v2b:20,nr:["Perfil rechazado créditos (2)","Sin motivo (2)"]},{k:"Aremi Emer",t:0,r:0,v2b:0,nr:[]},{k:"Sin asignar",t:20,r:0,v2b:0,nr:["20 sin kavako"]}];
+const TIP_MAP={
+  "sin motivo":{cls:"ta",txt:"Campo 'Comentarios apartado' vacío en estos registros. Pedir al equipo que lo llene en cada visita no cerrada."},
+  "perfil rechazado":{cls:"tr",txt:"Preparar 2-3 alternativas de menor precio antes de la visita. Para perfiles borderline, conectar con financiamiento en tiempo real."},
+  "sin presupuesto":{cls:"tr",txt:"Presentar simulación de crédito y enganche mínimo desde el inicio. Mostrar cuota mensual antes de que el cliente descarte por precio."},
+  "en consideración":{cls:"ta",txt:"Definir un siguiente paso concreto antes de que el cliente se retire. Hacer seguimiento al día siguiente con stock y simulación específica."},
+  "solo vino":{cls:"ta",txt:"Convertir la visita exploratoria en perfilamiento. Registrar y agendar cita de regreso con stock específico antes de que se retire."},
+  "condiciones":{cls:"ta",txt:"Tener comparativa de tasa Kavak vs agencia lista. Destacar: sin comisión por apertura, garantía mecánica, proceso digital."},
+  "sin asignar":{cls:"tr",txt:"Ningún cliente debe quedar sin kavako asignado. Conversión cero garantizada en este grupo."},
+  "titular":{cls:"ta",txt:"Confirmar antes de la visita si el cliente es el titular del crédito. Solicitar que venga acompañado del titular."},
+  "no le gusto":{cls:"ta",txt:"Preparar 3+ alternativas de stock similares antes de la visita. Hacer recorrido guiado de opciones para ampliar criterios."},
+  "trading":{cls:"ta",txt:"Agilizar proceso de inspección para reducir tiempo de espera. Dar seguimiento proactivo una vez que se liberen los espacios."},
+  "fiscal":{cls:"ta",txt:"Involucrar a un especialista fiscal en la visita o preparar información sobre opciones de facturación disponibles."},
+  "documentacion":{cls:"ta",txt:"Verificar documentación requerida ANTES de la cita (INE, CSF, refactura). Comunicar lista de docs al cliente con anticipación."},
+  "default":{cls:"",txt:"Registrar motivos detallados en 'Comentarios apartado' en cada visita no cerrada para poder gestionar el seguimiento."}
+};
+
+let recRows=[];
+let filtro='todos';
+let diasHistorial=[];
+
+// ── HELPERS ──
+function sp(n,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('page-'+n).classList.add('on');el.classList.add('on');}
+function tog(id){const p=document.getElementById(id);p.style.display=p.style.display==='none'?'block':'none';}
+function esRes(ap){
+  // UNA RESERVA = solo "Apartado en hub" o "Cambio de apartado" en la columna Apartado
+  const a=(ap||'').toLowerCase();
+  return a.includes('apartado en hub') || a.includes('cambio de apartado');
+}
+function esEntrega(cal){
+  // Se excluyen del V2B general solo Entregas y Entrega K2K
+  const c=(cal||'').toLowerCase().trim();
+  return c.startsWith('entrega');
+}
+function getTipo(cal){
+  const c=(cal||'').toLowerCase();
+  if(c.includes('cita sin reserva')) return 'cita';
+  if(c.includes('cita con reserva')) return 'cita';
+  if(c.includes('orgánico')||c.includes('organico')) return 'organico';
+  if(c.includes('seguimiento de venta')) return 'seguimiento_venta';
+  if(c.includes('seguimiento de compra')||c.includes('seguimiento compra')||c.includes('segundo pago')) return 'seguimiento_compra';
+  if(c.includes('inspección')||c.includes('inspeccion')) return 'inspeccion';
+  if(c.startsWith('entrega')) return 'entrega';
+  if(c.includes('no ingresó')||c.includes('no ingreso')) return 'no_ingreso';
+  if(c.includes('otro')) return 'otro';
+  return 'otro';
+}
+function getMot(apartadoCol, comentariosApartadoCol){
+  // Fuente principal: comentarios apartado. Fallback: columna apartado.
+  const ap  = (apartadoCol || '').toLowerCase().trim();
+  const co  = (comentariosApartadoCol || '').toLowerCase().trim();
+  const txt = co || ap;
+
+  // Sin texto en ninguna columna
+  if(!txt || txt==='-' || txt==='0') return 'Sin comentario registrado';
+
+  // Etiquetas internas del sistema (no son motivos reales del cliente)
+  if(/^(org[aá]nico\.?|organico\.?|cita\.?|cita\s+sin\s+reserva\.?|cliente\s*z\.?|alternos?\.?|prestamo\.?|otro\.?|kuna\.?)$/i.test(txt))
+    return 'Sin comentario registrado';
+
+  // 1. PERFIL RECHAZADO
+  if(/perfil.{0,15}rechaz|perfilamiento.{0,10}rechaz|p\.?\s*rechaz|cr[eé]dito.{0,15}rechaz|cr[eé]dito.{0,15}automotriz|cr[eé]dito.{0,10}activ|ingresos?.{0,15}bajos?|no.{0,10}comprobable|perfil\s*x\b/i.test(txt))
+    return 'Perfil rechazado';
+
+  // 2. SIN PRESUPUESTO / ENGANCHE
+  if(/no.{0,15}ten[ií](a|an)?.{0,15}(el\s+)?total|no.{0,15}tienen?.{0,15}(dinero|presupuesto|enganche|capital)|falt[ao].{0,20}(dinero|enganche|\$[0-9]|presupuesto)|sin.{0,10}(presupuesto|enganche|dinero)|junt[ao].{0,15}(dinero|m[aá]s)|enganche.{0,10}(superior|alto|mayor)|tarifa.{0,15}servicio|no.{0,15}contempla(ba)?|a[uú]n.{0,10}no.{0,10}tiene.{0,10}dinero|pago.{0,10}contado.{0,10}(sin|pero|no\s+ten)|continua.{0,15}viendo.{0,15}opciones/i.test(txt))
+    return 'Sin presupuesto / enganche';
+
+  // 3. POSPONE DECISIÓN
+  if(/regresa?.{0,20}(ma[ñn]ana|vigencia|despu[eé]s|siguiente)|vuelve?.{0,15}ma[ñn]ana|espera(ndo)?.{0,20}(dinero|fecha|pago|devoluci[oó]n|propuesta|resultado|liberen|capital)|procede.{0,20}(mitad|final).{0,10}mes|compra.{0,20}(mayo|mes.{0,5}siguiente|pr[oó]ximo)|puede.{0,15}volver|cita.{0,10}para.{0,10}ma[ñn]ana|agend[oó].{0,15}(cita|visita)|viene?.{0,15}ma[ñn]ana/i.test(txt))
+    return 'Pospone decisión';
+
+  // 4. NO ES TITULAR / CONSULTA A TERCERO
+  if(/no.{0,10}es.{0,10}titular|no.{0,10}titular|platicarlo|esposo|esposa|pap[aá]|platicar.{0,10}(con|a)|decisi[oó]n.{0,15}(con|a)|consult[ao].{0,10}(esposo|esposa|pap[aá])/i.test(txt))
+    return 'No es titular / consulta a tercero';
+
+  // 5. CONDICIONES / PRECIO / TASA
+  if(/tasa.{0,20}(alta|elevada|mejor|agencia|10%|se eleva)|agencia.{0,15}(mejor|menor|tasa)|comisi[oó]n.{0,10}apertura|metodolog[ií]a.{0,10}(no|sin)|autofinanciamiento.{0,15}tasa/i.test(txt))
+    return 'Condiciones / precio / tasa';
+
+  // 6. BUSCA FINANCIAMIENTO
+  if(/busca.{0,15}financiamiento|solicita.{0,15}cr[eé]dito|quiere.{0,15}financiar|financiamiento.{0,15}(busca|solicita|quiere|ver)/i.test(txt))
+    return 'Busca opciones de financiamiento';
+
+  // 7. NO LE GUSTÓ EL AUTO / BUSCA OTRA SEDE U OPCIÓN
+  if(/no.{0,15}(le.{0,10}gust[oó]|convenci[oó]|le.{0,10}agrada|encontr[oó])|problem[ao].{0,10}mec[aá]nic|quiere.{0,10}(ver.{0,5})?(otro|m[aá]s).{0,5}(auto|coche|sede)|no.{0,15}encontr[oó].{0,15}(auto|nada|lo que)|ver.{0,15}(otra.{0,5}sede|m[aá]s.{0,5}autos?|santafe|antara|santa fe)|no.{0,10}se.{0,10}adapt[oó]|busca.{0,10}pick\s*up/i.test(txt))
+    return 'No le gustó el auto / busca otra opción';
+
+  // 8. SOLO VINO A INFORMARSE / VER OPCIONES
+  if(/solo.{0,15}(ver|vino|vine|vinieron|inform|conocer|preguntar)|[uú]nicamente.{0,10}(ver|inform|conocer)|vinieron?.{0,10}a.{0,10}ver|sin.{0,10}inter[eé]s|s[oó]lo.{0,10}por.{0,10}inform|viene.{0,10}(ver opciones|conocer|a ver)|est[aá]n?.{0,15}(revisando|viendo).{0,15}opciones|ven[ií][ao].{0,10}(a ver|ver)|solo\s+ven[ií]an\s+a\s+ver|informes\b/i.test(txt))
+    return 'Solo vino a informarse / ver opciones';
+
+  // 9. PROBLEMA TÉCNICO DE PERFILAMIENTO (cel sin pila, SMS, sistema)
+  if(/no.{0,10}trae.{0,10}pila|sin.{0,10}(pila|bater[ií]a)|sms|no.{0,10}puede.{0,10}(recibir|sms)|sin.{0,10}registro.{0,10}(claios|sistema)|no.{0,10}se.{0,10}perfila|no.{0,10}ingres[oó]|no.{0,10}tiene\s+carros\s+en\s+particular/i.test(txt))
+    return 'Problema técnico de perfilamiento';
+
+  // 10. DOCUMENTACIÓN INCOMPLETA / DATOS ALTERNOS
+  if(/datos.{0,10}(alterno|alt\.?|incompleto)|sin.{0,10}(ine|csf|documentos?)|no.{0,10}(trae|tiene|trajo).{0,10}(doc|ine|csf)|falt[ao].{0,10}(doc|ine|endoso|refactura|csf)|carta.{0,10}factura|sin.{0,10}comprobante|perfilado.{0,10}hub/i.test(txt))
+    return 'Documentación incompleta / datos alternos';
+
+  // 11. EN PROCESO DE TRADING / INSPECCIÓN
+  if(/trading|trade.{0,5}in|inspecci[oó]n.{0,15}(pendiente|agend|programad)|devoluci[oó]n.{0,15}(camioneta|auto|unidad)/i.test(txt))
+    return 'En proceso de trading / inspección';
+
+  // 12. ESTRATEGIA FISCAL
+  if(/fiscal|factura(r|ci[oó]n)?|r[eé]gimen|sat\b|cfdi/i.test(txt))
+    return 'Estrategia fiscal / facturación';
+
+  // 13. CLIENTE RECURRENTE / EVALÚA CAMBIO
+  if(/ya.{0,10}tiene.{0,10}(un|coche|kavak)|tiene.{0,10}coche.{0,10}de.{0,10}kavak|cliente.{0,10}(recurrente|ya.{0,5}vino|conoce).{0,20}proceso|primero.{0,15}(quiere|ver).{0,15}(venta|inspecci)/i.test(txt))
+    return 'Cliente recurrente / evalúa cambio';
+
+  // 14. FALLBACK por columna Apartado cuando comentarios no aportaron info
+  if(!co) {
+    if(/sin.{0,10}inter[eé]s/i.test(ap))             return 'Solo vino a informarse / ver opciones';
+    if(/no.{0,10}cuenta.{0,10}presupuesto/i.test(ap)) return 'Sin presupuesto / enganche';
+    if(/en.{0,5}consideraci[oó]n/i.test(ap))          return 'En evaluación (sin detalle adicional)';
+    if(/s[oó]lo.{0,10}(vino|a conocer)/i.test(ap))   return 'Solo vino a informarse / ver opciones';
+  }
+
+  // 15. FALLBACK SEMÁNTICO — hay texto pero no encajó en categorías específicas
+  if(/ver.{0,10}(auto|coche|opci[oó]n)|explorando|mirando|busca(ndo)?/i.test(txt))
+    return 'Solo vino a informarse / ver opciones';
+  if(/espera|vuelve|regresa|ma[ñn]ana|despu[eé]s|siguiente/i.test(txt))
+    return 'Pospone decisión';
+  if(/dinero|presupuesto|capital|caro|precio|costoso/i.test(txt))
+    return 'Sin presupuesto / enganche';
+
+  // Casos específicos adicionales
+  if(/checa.{0,15}cotizaci[oó]n|comparando.{0,10}precio|busca.{0,10}(mejor|otro).{0,10}precio|revisa.{0,10}opciones.{0,10}precio/i.test(txt))
+    return 'Condiciones / precio / tasa';
+  if(/cr[eé]dito.{0,5}automotriz|cr[eé]ditos?.{0,10}activo|cuenta.{0,10}con.{0,10}\d.{0,5}cr[eé]dito/i.test(txt))
+    return 'Perfil rechazado';
+  if(/desconoce.{0,20}(datos|vehiculo|auto)|no.{0,15}pudo.{0,15}(agenda|agendar)|sin.{0,15}datos.{0,15}(vehiculo|auto)/i.test(txt))
+    return 'Problema técnico de perfilamiento';
+  if(/perfilad[ao].{0,20}(hub|alternos?|coordenadas?|con datos)|se.{0,10}le.{0,10}dan.{0,10}coordenadas?/i.test(txt))
+    return 'Documentación incompleta / datos alternos';
+  if(/^(org[aá]?n?c?i?\.?|cita?\.?|alt\.?)$/i.test(txt.trim()))
+    return 'Sin comentario registrado';
+  // "ORGANICO PERFILADO" y similares — perfilado sin más detalle → documentación/proceso
+  if(/org[aá]nico.{0,10}perfilad[ao]|perfilad[ao].{0,10}(activo|en proceso)?/i.test(txt))
+    return 'Documentación incompleta / datos alternos';
+  // Cualquier texto con "organico" sin info adicional → sin comentario útil
+  if(/^org[aá]nico\b/i.test(txt.trim()))
+    return 'Sin comentario registrado';
+
+  // FALLBACK FINAL — hay texto escrito, clasificar por palabras clave genéricas
+  if(/ver.{0,10}(auto|coche|opci[oó]n)|explorando|mirando|busca(ndo)?/i.test(txt))
+    return 'Solo vino a informarse / ver opciones';
+  if(/espera|vuelve|regresa|ma[ñn]ana|despu[eé]s|siguiente/i.test(txt))
+    return 'Pospone decisión';
+  if(/dinero|presupuesto|capital|caro|precio|costoso/i.test(txt))
+    return 'Sin presupuesto / enganche';
+  // Tiene texto pero no encaja en ningún patrón conocido — se captura como pendiente
+  return 'Sin comentario registrado';
+}
+function parseTSV(raw){const lines=raw.trim().split('\n').filter(l=>l.trim());if(lines.length<2)return[];const sep=lines[0].includes('\t')?'\t':'|';const heads=lines[0].split(sep).map(h=>h.trim().toLowerCase());return lines.slice(1).map(l=>{const cols=l.split(sep).map(c=>c.trim());const r={};heads.forEach((h,i)=>{r[h]=cols[i]||'';});return r;});}
+function cv(row,...keys){for(const k of keys){const v=row[k]||row[k.toLowerCase()];if(v)return v;}return'';}
+function calcM(arr){
+  // Devuelve [{motivo, count, clientes:[{nombre,correo,tel,stock,comentario}]}]
+  const map={};
+  arr.forEach(r=>{
+    const m=r.motivoCalculado||getMot(r.apartado,r.comentario);
+    if(!map[m]) map[m]={motivo:m,count:0,clientes:[]};
+    map[m].count++;
+    map[m].clientes.push({
+      nombre: r.cliente||'—',
+      correo: r.correo||r.email||'—',
+      tel:    r.tel||'—',
+      stock:  r.stock||r.auto||r.idTransaccion||'',
+      comentario: r.comentario||r.comentariosApartado||''
+    });
+  });
+  return Object.values(map).sort((a,b)=>b.count-a.count);
+}
+
+let _mDetUid=0;
+function renderML(motivos, barClass, pctColor){
+  if(!motivos||!motivos.length) return '<div style="font-size:12px;color:#aaa;padding:8px 0">Sin no-conversiones</div>';
+  // Acepta [{motivo,count,clientes}] (nuevo) o [[m,c]] (legacy precargado)
+  const items = Array.isArray(motivos[0])
+    ? motivos.map(([m,c])=>({motivo:m,count:c,clientes:[]}))
+    : motivos;
+  const total=items.reduce((s,i)=>s+i.count,0);
+  const max=items[0].count;
+  return items.map(item=>{
+    const uid='md'+(++_mDetUid);
+    const tieneDet=item.clientes&&item.clientes.length>0;
+    const pct=(item.count/total*100).toFixed(1);
+    const barW=Math.round(item.count/max*100);
+
+    let detHTML='';
+    if(tieneDet){
+      detHTML=item.clientes.map(cl=>{
+        const esc=s=>(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+        const nom=esc(cl.nombre||'—');
+        const corr=cl.correo&&cl.correo!=='—'
+          ?`<a href="mailto:${esc(cl.correo)}" class="m-detail-correo" title="${esc(cl.correo)}">${esc(cl.correo)}</a>`
+          :`<span class="m-detail-correo" style="color:#c8cbd8">Sin correo</span>`;
+        const tel=cl.tel&&cl.tel!=='—'&&cl.tel!==''
+          ?`<a href="tel:${esc(cl.tel)}" style="color:#3B82F6;font-size:11px;text-decoration:none" title="${esc(cl.tel)}">📞 ${esc(cl.tel)}</a>`
+          :`<span style="color:#c8cbd8;font-size:11px">Sin tel.</span>`;
+        const stk=cl.stock&&cl.stock!==''&&cl.stock!=='-'
+          ?`<span class="m-detail-stock">${esc(cl.stock)}</span>`
+          :`<span class="m-detail-stock empty">Sin ID</span>`;
+        const comt=cl.comentario&&cl.comentario!=='-'&&cl.comentario!==''
+          ?`<div style="font-size:10px;color:#aaa;margin-top:2px;font-style:italic">"${esc(cl.comentario.slice(0,90))}${cl.comentario.length>90?'…':''}"</div>`
+          :'';
+        return `<div class="m-detail-row">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span class="m-detail-nombre">${nom}</span>${corr}${tel}${stk}
+            </div>${comt}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    const chevron=tieneDet?`<span class="m-chevron" id="chv_${uid}">›</span>`:'';
+    const cursor=tieneDet?`style="cursor:pointer" data-uid="${uid}"`:'';
+    return `<div class="m-row" id="row_${uid}" ${cursor}>
+      <span class="m-name">${item.motivo}</span>
+      <div class="m-bar-bg"><div class="m-bar-f ${barClass}" style="width:${barW}%"></div></div>
+      <span class="m-pct" style="color:${pctColor}">${pct}%</span>
+      <span class="m-cnt">${item.count}</span>
+      ${chevron}
+    </div>${tieneDet?`<div class="m-detail" id="${uid}">${detHTML}</div>`:''}`;
+  }).join('');
+}
+
+// Delegación global para los m-row expandibles
+document.addEventListener('click',function(e){
+  const row=e.target.closest('[data-uid]');
+  if(!row) return;
+  const uid=row.getAttribute('data-uid');
+  const det=document.getElementById(uid);
+  const chv=document.getElementById('chv_'+uid);
+  if(!det) return;
+  const open=det.classList.toggle('open');
+  row.classList.toggle('open',open);
+  if(chv) chv.style.transform=open?'rotate(90deg)':'';
+  if(chv) chv.style.color=open?'#1D9E75':'#c8cbd8';
+});
+function getTipKey(nrl){
+  const a=nrl.join(' ').toLowerCase();
+  if(a.includes('sin asignar')) return 'sin asignar';
+  if(a.includes('perfil rechazado')||a.includes('credito')) return 'perfil rechazado';
+  if(a.includes('sin presupuesto')||a.includes('enganche')) return 'sin presupuesto';
+  if(a.includes('no es titular')||a.includes('tercero')) return 'titular';
+  if(a.includes('no le gustó')||a.includes('busca otra')) return 'no le gusto';
+  if(a.includes('trading')||a.includes('inspección')) return 'trading';
+  if(a.includes('fiscal')||a.includes('facturac')) return 'fiscal';
+  if(a.includes('documentación')||a.includes('datos alternos')) return 'documentacion';
+  if(a.includes('solo vino')||a.includes('informarse')) return 'solo vino';
+  if(a.includes('condiciones')||a.includes('tasa')) return 'condiciones';
+  if(a.includes('pospone')) return 'en consideración';
+  if(a.includes('sin comentario')||a.includes('sin motivo')) return 'sin motivo';
+  return 'default';
+}
+function kname(e){if(!e||e==='sin asignar')return'Sin asignar';if(e.includes('@'))return e.split('@')[0].split('.').map(p=>p.charAt(0).toUpperCase()+p.slice(1)).join(' ');return e;}
+function bv(v){const cls=v>=60?'rv-g':v>=35?'rv-a':'rv-r';const bc=v>=60?'#1D9E75':v>=35?'#BA7517':'#EF4444';return`<div class="rbv"><span class="rvbadge ${cls}">${v.toFixed(1)}%</span><span class="rbar"><span class="rbar-f" style="width:${Math.min(v,100)}%;background:${bc}"></span></span></div>`;}
+function rc(i){return i===0?'#1D9E75':i===1?'#5DCAA5':i===2?'#9FE1CB':'#ccc';}
+
+// ── RANKING ──
+function renderTablas(){
+  [[...CITAS_D,'tbody-cita'],[...ORGS_D,'tbody-org']].forEach(arr=>{const id=arr.pop();const rows=[...arr].sort((a,b)=>b.v2b-a.v2b);document.getElementById(id).innerHTML=rows.map((r,i)=>`<tr><td><span class="rank-num" style="color:${rc(i)}">${i+1}</span></td><td style="font-size:11px" title="${r.k}">${r.k}</td><td>${r.t}</td><td>${r.r}</td><td>${bv(r.v2b)}</td></tr>`).join('');});
+}
+renderTablas();
+
+// ── FEEDBACK ──
+function buildFB(cArr,oArr,cid){
+  const map={};cArr.forEach(r=>{if(!map[r.k])map[r.k]={k:r.k,cita:null,org:null};map[r.k].cita=r;});oArr.forEach(r=>{if(!map[r.k])map[r.k]={k:r.k,cita:null,org:null};map[r.k].org=r;});
+  document.getElementById(cid).innerHTML=Object.values(map).filter(e=>e.k!=='Sin asignar').map(e=>{const cita=e.cita,org=e.org;const nrAll=[...(cita?cita.nr:[]),...(org?org.nr:[])];const tip=TIP_MAP[getTipKey(nrAll)]||TIP_MAP['default'];const v2bCH=cita?`<span class="tp-cita" style="font-size:10px;margin-right:4px">Cita ${cita.v2b.toFixed(0)}%</span>`:'';const v2bOH=org?`<span class="tp-org" style="font-size:10px">Org ${org.v2b.toFixed(0)}%</span>`:'';const nrRows=nrAll.length?nrAll.map((m,i)=>{const col=i%3===0?'#7F77DD':i%3===1?'#BA7517':'#1D9E75';return`<div class="fb-m"><div class="fb-dot" style="background:${col}"></div><span class="fb-mname">${m}</span></div>`;}).join(''):`<div style="font-size:11px;color:#1D9E75;padding:4px 0">✓ Sin no-conversiones</div>`;return`<div class="fb-card"><div class="fb-header"><span class="fb-name">${e.k}</span><div class="fb-badges">${v2bCH}${v2bOH}</div></div><div class="fb-motivos">${nrRows}</div><div class="fb-tip ${tip.cls}">${tip.txt}</div></div>`;}).join('');
+}
+buildFB(CITAS_D,ORGS_D,'fb-grid');
+
+// ── FEED GENERATOR ──
+function genFeed(cNR,oNR,v2bGen,v2bC,v2bO){
+  const items=[];const totalNR=cNR.length+oNR.length;
+  if(v2bGen>=50)items.push({icon:'🟢',bg:'#EAF3DE',titulo:`V2B general fuerte: ${v2bGen.toFixed(1)}%`,desc:'El día cerró con buena conversión.',accion:'Hacer seguimiento a clientes en consideración para capitalizar.',tag:'V2B general'});
+  else if(v2bGen>=35)items.push({icon:'🟡',bg:'#FAEEDA',titulo:`V2B general moderado: ${v2bGen.toFixed(1)}%`,desc:'Hay margen de mejora.',accion:'Activar seguimiento hoy a clientes en consideración.',tag:'V2B general'});
+  else items.push({icon:'🔴',bg:'#FCEBEB',titulo:`V2B general bajo: ${v2bGen.toFixed(1)}%`,desc:'Día con conversión baja.',accion:'Prioridad: seguimiento HOY a todos los clientes que no reservaron.',tag:'V2B general'});
+  const cnt={};[...cNR,...oNR].forEach(r=>{const m=getMot(r.apartado,r.comentario);cnt[m]=(cnt[m]||0)+1;});
+  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
+  if(sorted.length&&totalNR>0){const[topM,topC]=sorted[0];const pct=(topC/totalNR*100).toFixed(0);const accMap={"Sin motivo registrado":"Recordar al equipo llenar el campo motivo en cada no-reserva.","Sin presupuesto / enganche":"Presentar simulación de crédito desde el inicio de la visita mañana.","Perfil rechazado":"Tener alternativas de menor precio listas antes de cada cita.","Solo vino a informarse":"Convertir visitas exploratorias en perfilamiento.","En consideración":"Hacer seguimiento mañana con propuesta concreta.","Pospone decisión":"Contactar hoy con oferta de stock específico.","Condiciones / precio / tasa":"Preparar comparativa Kavak vs agencia."};items.push({icon:'📊',bg:'#EEEDFE',titulo:`Motivo #1: "${topM}" — ${pct}%`,desc:`${topC} de ${totalNR} clientes.`,accion:accMap[topM]||'Registrar y dar seguimiento.',tag:'Motivo principal'});}
+  const sa=[...cNR,...oNR].filter(r=>!r.kavako||r.kavako.includes('sin asignar')||r.kavako==='');
+  if(sa.length)items.push({icon:'⚠️',bg:'#FCEBEB',titulo:`${sa.length} cliente(s) sin kavako asignado`,desc:'Conversión cero garantizada.',accion:'Revisar asignaciones.',tag:'Asignación'});
+  const enC=[...cNR,...oNR].filter(r=>['En consideración','Pospone decisión'].includes(getMot(r.apartado,r.comentario)));
+  if(enC.length)items.push({icon:'📞',bg:'#FAEEDA',titulo:`${enC.length} cliente(s) pendientes de seguimiento`,desc:enC.map(r=>r.cliente||'—').join(', ')+'.',accion:'Contactar mañana antes de las 12pm.',tag:'Seguimiento'});
+  return items;
+}
+
+// ── AGREGAR A RECOVERY desde datos ──
+// Motivos que NO entran a Recovery — sin potencial de conversión
+const MOTIVOS_NO_CONVERTIBLES = new Set([
+  'Perfil rechazado',
+  'Sin comentario registrado',
+  'Problema técnico de perfilamiento',
+  'Documentación incompleta / datos alternos',
+]);
+
+function esConvertible(motivo){
+  return !MOTIVOS_NO_CONVERTIBLES.has(motivo);
+}
+
+function poblarRecovery(rows,fecha){
+  const existentes=new Set(recRows.map(r=>r.cliente+'|'+r.fecha));
+  let added=0;
+  rows.forEach((r,i)=>{
+    const tipo=getTipo(cv(r,'calificación de la visita','calificacion de la visita','calificacion','tipo'));
+    const apartado=cv(r,'apartado');
+    if(!['cita','organico'].includes(tipo)||esRes(apartado))return;
+    const cliente=cv(r,'cliente','nombre');
+    const key=cliente+'|'+fecha;
+    if(existentes.has(key))return;
+    existentes.add(key);
+    const comentariosApartado=cv(r,'comentarios apartado','comentario apartado','comentarios de apartado');
+    const motivo=getMot(apartado, comentariosApartado);
+    if(!esConvertible(motivo)) return; // descartar no convertibles
+    recRows.push({
+      id:Date.now()+Math.random(),
+      cliente,
+      tel:cv(r,'teléfono','telefono','tel','phone','teléfono del cliente'),
+      tipo,
+      kavako:kname(cv(r,'kavako asignado','kavako','asesor')),
+      motivo,
+      llamado:false,nota:'',fecha
+    });
+    added++;
+  });
+  return added;
+}
+
+// ── CARGAR PRINCIPAL — fuente única de datos ──
+function cargarPrincipal(){
+  const raw=document.getElementById('mainInput').value.trim();
+  if(!raw){alert('Pega los datos primero');return;}
+  const rows=parseTSV(raw);
+  if(!rows.length){alert('No se pudo leer. Verifica encabezados.');return;}
+
+  // 1. Extraer fecha
+  const fecha=cv(rows[0],'fecha','date')||new Date().toLocaleDateString('es-MX');
+
+  // 2. Mapear todos los registros
+  const todos=rows.map(r=>({
+    cliente:cv(r,'cliente','nombre'),
+    calificacion:cv(r,'calificación de la visita','calificacion de la visita','calificacion','tipo'),
+    kavako:cv(r,'kavako asignado','kavako','asesor'),
+    apartado:cv(r,'apartado'),
+    comentario:cv(r,'comentarios apartado','comentario apartado','comentarios de apartado'),
+    compra:cv(r,'compra','comentarios compra'),
+    comentarioGeneral:cv(r,'comentario general','comentarios','motivos'),
+    tel:cv(r,'teléfono','telefono','tel','phone','teléfono del cliente'),
+    correo:cv(r,'correo','email','e-mail','correo electrónico'),
+    stock:cv(r,'id transacción','id transaccion','stock id','auto','stock','id local'),
+  }));
+
+  const citas=todos.filter(r=>getTipo(r.calificacion)==='cita');
+  const orgs=todos.filter(r=>getTipo(r.calificacion)==='organico');
+  const segs=todos.filter(r=>['seguimiento_venta','seguimiento_compra'].includes(getTipo(r.calificacion)));
+  const inspecciones=todos.filter(r=>getTipo(r.calificacion)==='inspeccion');
+
+  // V2B GENERAL = TODOS los registros EXCEPTO Entregas (Entrega y Entrega K2K)
+  const all=todos.filter(r=>!esEntrega(r.calificacion));
+  const entregas=todos.filter(r=>esEntrega(r.calificacion));
+
+  // Reserva = Apartado en hub | Cambio de apartado (solo esas dos)
+  const citasRes=citas.filter(r=>esRes(r.apartado));
+  const orgsRes=orgs.filter(r=>esRes(r.apartado));
+  const allRes=all.filter(r=>esRes(r.apartado));
+  const cNR=citas.filter(r=>!esRes(r.apartado));
+  const oNR=orgs.filter(r=>!esRes(r.apartado));
+
+  // Enriquecer con motivo calculado para que calcM y genFeed lo usen directamente
+  [...cNR,...oNR].forEach(r=>{
+    r.motivoCalculado = getMot(r.apartado, r.comentario);
+  });
+  const v2bGen=all.length?(allRes.length/all.length*100):0;
+  const v2bC=citas.length?(citasRes.length/citas.length*100):0;
+  const v2bO=orgs.length?(orgsRes.length/orgs.length*100):0;
+
+  // 3. Actualizar KPIs del resumen dinámicamente
+  document.getElementById('main-kpis').innerHTML=`
+    <div class="kpi"><div class="kpi-lbl">V2B general</div><div class="kpi-val" style="color:#1D9E75">${v2bGen.toFixed(1)}%</div><div class="kpi-sub">${allRes.length} reservas de ${all.length}</div></div>
+    <div class="kpi"><div class="kpi-lbl">V2B citas</div><div class="kpi-val" style="color:#3C3489">${v2bC.toFixed(1)}%</div><div class="kpi-sub">${citasRes.length} de ${citas.length} citas</div></div>
+    <div class="kpi"><div class="kpi-lbl">V2B orgánicos</div><div class="kpi-val" style="color:#854F0B">${v2bO.toFixed(1)}%</div><div class="kpi-sub">${orgsRes.length} de ${orgs.length} orgánicos</div></div>
+    <div class="kpi"><div class="kpi-lbl">No reservaron</div><div class="kpi-val">${cNR.length+oNR.length}</div><div class="kpi-sub">Citas: ${cNR.length} · Org: ${oNR.length}</div></div>`;
+
+  document.getElementById('main-chips').innerHTML=`
+    <span class="chip ct">${citas.length} citas sin reserva</span>
+    <span class="chip cp">${orgs.length} orgánicos</span>
+    <span class="chip ca">${segs.length} seguimientos</span>
+    <span class="chip" style="background:#F0EDFF;color:#4B3FA8">${inspecciones.length} inspecciones</span>`;
+  document.getElementById('main-subtitulo').textContent=`${fecha} · ${all.length} visitas para V2B (excluye ${entregas.length} entrega${entregas.length!==1?'s':''}) · Total sheet: ${todos.length}`;
+
+  // Actualizar V2B cards
+  document.getElementById('v2b-gen-num').textContent=v2bGen.toFixed(1)+'%';
+  document.getElementById('v2b-gen-desc').textContent=`${allRes.length} de ${all.length} visitas`;
+  document.getElementById('v2b-gen-bar').style.width=Math.min(v2bGen,100)+'%';
+  document.getElementById('v2b-cita-num').textContent=v2bC.toFixed(1)+'%';
+  document.getElementById('v2b-cita-desc').textContent=`${citasRes.length} de ${citas.length} citas`;
+  document.getElementById('v2b-cita-bar').style.width=Math.min(v2bC,100)+'%';
+  document.getElementById('v2b-org-num').textContent=v2bO.toFixed(1)+'%';
+  document.getElementById('v2b-org-desc').textContent=`${orgsRes.length} de ${orgs.length} orgánicos`;
+  document.getElementById('v2b-org-bar').style.width=Math.min(v2bO,100)+'%';
+
+  // 4. Alimentar historial (Motivos por día) — agrupa por fecha
+  const existeDia=diasHistorial.find(d=>d.fecha===fecha);
+  if(!existeDia){
+    diasHistorial.unshift({fecha,all:all.length,allRes:allRes.length,citas:citas.length,citasRes:citasRes.length,orgs:orgs.length,orgsRes:orgsRes.length,segs:segs.length,v2bGen,v2bC,v2bO,cNR,oNR,mCita:calcM(cNR),mOrg:calcM(oNR),feed:genFeed(cNR,oNR,v2bGen,v2bC,v2bO)});
+  } else {
+    // Si ya existe el día, actualiza sus datos
+    Object.assign(existeDia,{all:all.length,allRes:allRes.length,citas:citas.length,citasRes:citasRes.length,orgs:orgs.length,orgsRes:orgsRes.length,segs:segs.length,v2bGen,v2bC,v2bO,cNR,oNR,mCita:calcM(cNR),mOrg:calcM(oNR),feed:genFeed(cNR,oNR,v2bGen,v2bC,v2bO)});
+  }
+  renderDias();
+
+  // 5. Alimentar Recovery
+  poblarRecovery(rows,fecha);
+  renderRec();
+
+  // 6. Cerrar panel
+  tog('up1');
+
+  // 7. Confirmar
+  const badge=document.getElementById('carga-badge');
+  if(badge){badge.textContent=`✓ ${fecha} cargado`;badge.style.display='inline-flex';}
+}
+
+// Meta diaria: 30%
+// Verde  ≥ 30%  (cumple meta)
+// Amarillo 20–29% (cerca, ≤10pts de la meta)
+// Naranja  10–19% (lejos, >10pts y ≤20pts)
+// Rojo    < 10%  (muy lejos)
+function indCol(v){
+  if(v>=30) return 'ig';       // verde  — meta cumplida
+  if(v>=20) return 'ia';       // amarillo — cerca
+  if(v>=10) return 'io';       // naranja — lejos
+  return 'ir';                 // rojo — muy lejos
+}
+function renderDias(){
+  const grid=document.getElementById('dias-grid');const empty=document.getElementById('hist-empty');cerrarDet();
+  if(!diasHistorial.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=diasHistorial.map((d,i)=>`<div class="dia-card" onclick="abrirDet(${i})"><div class="dia-ind ${indCol(d.v2bGen)}"></div><div class="dia-fecha">${d.fecha}</div><div class="dia-v2b">${d.v2bGen.toFixed(1)}%</div><div class="dia-vsub">V2B general</div><div class="dia-chips"><span class="dc dcp">C ${d.v2bC.toFixed(0)}%</span><span class="dc dca">O ${d.v2bO.toFixed(0)}%</span></div><div style="font-size:10px;color:#aaa;margin-top:6px">${d.all} visitas · ${d.allRes} reservas</div></div>`).join('');
+}
+function abrirDet(idx){
+  const d=diasHistorial[idx];
+  if(!d) return;
+  document.querySelectorAll('.dia-card').forEach((c,i)=>c.classList.toggle('on',i===idx));
+  document.getElementById('det-titulo').textContent=`Detalle — ${d.fecha}`;
+  document.getElementById('det-sub').textContent=`${d.all} visitas · ${d.citas} citas · ${d.orgs} orgánicos · ${d.segs} seguimientos`;
+  document.getElementById('det-cc').textContent=`${(d.cNR||[]).length} sin reservar`;
+  document.getElementById('det-oc').textContent=`${(d.oNR||[]).length} sin reservar`;
+  document.getElementById('det-feed-title').textContent=`Feed del día — ${d.fecha}`;
+  document.getElementById('det-kpi').innerHTML=`<div class="dk"><div class="dk-lbl">V2B general</div><div class="dk-val" style="color:#1D9E75">${d.v2bGen.toFixed(1)}%</div><div class="dk-sub">${d.allRes}/${d.all}</div></div><div class="dk"><div class="dk-lbl">V2B citas</div><div class="dk-val" style="color:#3C3489">${d.v2bC.toFixed(1)}%</div><div class="dk-sub">${d.citasRes}/${d.citas}</div></div><div class="dk"><div class="dk-lbl">V2B orgánicos</div><div class="dk-val" style="color:#854F0B">${d.v2bO.toFixed(1)}%</div><div class="dk-sub">${d.orgsRes}/${d.orgs}</div></div><div class="dk"><div class="dk-lbl">No reservaron</div><div class="dk-val">${(d.cNR||[]).length+(d.oNR||[]).length}</div><div class="dk-sub">C: ${(d.cNR||[]).length} · O: ${(d.oNR||[]).length}</div></div>`;
+
+  // Recalcular mCita y mOrg siempre al abrir para asegurar formato correcto
+  const mCita = Array.isArray(d.cNR) ? calcM(d.cNR) : [];
+  const mOrg  = Array.isArray(d.oNR) ? calcM(d.oNR) : [];
+  document.getElementById('det-mc').innerHTML=renderML(mCita,'mf-c','#3C3489');
+  document.getElementById('det-mo').innerHTML=renderML(mOrg,'mf-o','#854F0B');
+
+  const feed = Array.isArray(d.feed) ? d.feed : [];
+  document.getElementById('det-feed').innerHTML=feed.map(f=>`<li class="feed-item"><div class="feed-icon" style="background:${f.bg}">${f.icon}</div><div class="feed-body"><div class="feed-title">${f.titulo}</div><div class="feed-desc">${f.desc}</div><div class="feed-accion">→ ${f.accion}</div><div class="feed-tag">${f.tag}</div></div></li>`).join('');
+
+  document.getElementById('detalle-panel').classList.add('on');
+  document.getElementById('detalle-panel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function cerrarDet(){document.getElementById('detalle-panel').classList.remove('on');document.querySelectorAll('.dia-card').forEach(c=>c.classList.remove('on'));}
+function cerrarDetalle(){cerrarDet();}
+
+// ── RECOVERY toggle/nota ──
+
+function toggleLlam(id){
+  const r=recRows.find(r=>r.id===id);
+  if(!r) return;
+  if(!r.llamado){
+    // Leer nombre: primero del dropdown visible, luego del campo ya guardado en r.llamadoPor
+    const sel=document.querySelector(`.sel-llamador[data-id="${id}"]`);
+    const nombreSel=sel&&sel.value ? sel.value : '';
+    const nombre=nombreSel||r.llamadoPor||'';
+    if(!nombre){
+      alert('Selecciona tu nombre en el dropdown "— Yo llamé —" antes de marcar la llamada.');
+      return;
+    }
+    // Leer nota del textarea antes del re-render
+    const ta=document.querySelector(`textarea[data-id="${id}"]`);
+    if(ta&&ta.value) r.nota=ta.value;
+    r.llamado=true;
+    r.llamadoPor=nombre;
+    r.llamadoTs=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+  } else {
+    if(!confirm('¿Desmarcar esta llamada?')) return;
+    r.llamado=false; r.llamadoPor=''; r.llamadoTs='';
+  }
+  renderRec();
+}
+
+function asignarLlamador(id, nombre){
+  // Solo guarda quién va a llamar — NO marca como llamado todavía
+  // El check verde es el que confirma que la llamada se realizó
+  const r=recRows.find(r=>r.id===id);
+  if(!r||r.llamado) return;
+  r.llamadoPor=nombre||'';
+  // No renderizamos completo para no perder el estado del textarea
+  // Solo actualizamos el select visualmente (ya tiene el valor seleccionado por el propio select)
+}
+
+function desmarcarLlam(id){
+  const r=recRows.find(r=>r.id===id);
+  if(!r) return;
+  if(!confirm('¿Desmarcar esta llamada?')) return;
+  r.llamado=false; r.llamadoPor=''; r.llamadoTs='';
+  renderRec();
+}
+function setNota(id,val){const r=recRows.find(r=>r.id===id);if(r)r.nota=val;updateKpis();}
+function setF(f,el){filtro=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');renderRec();}
+
+// Lista de kavakos conocidos (se actualiza dinámicamente)
+const KAVAKOS_CONOCIDOS = [
+  "Aremi Emer",
+  "Brandon Jarquinmartinez",
+  "Dionicio Luiz",
+  "Francisco Ramirez",
+  "Gabriela Sanchez",
+  "Ivan Covarrubias",
+  "Jenifer Hernandez",
+  "Oscar Longines",
+  "Samuel Rodriguez"
+];
+
+function getKavakosActivos(){
+  // Usar solo la lista fija — los recRows pueden tener variantes de nombre por el kname()
+  return [...KAVAKOS_CONOCIDOS].sort();
+}
+
+function updateSelectKavako(){
+  const sel=document.getElementById('filtro-kavako');
+  if(!sel) return;
+  const current=sel.value;
+  const kavakos=getKavakosActivos();
+  sel.innerHTML='<option value="">Todos</option>'+kavakos.map(k=>`<option value="${k}"${k===current?' selected':''}>${k}</option>`).join('');
+}
+
+function updateKavakosGrid(){
+  const grid=document.getElementById('rec-kavako-grid');
+  if(!grid) return;
+  const kavakos=getKavakosActivos();
+  // Solo mostrar kavakos que tienen clientes en recovery
+  const activos=kavakos.filter(k=>recRows.some(r=>r.kavako===k));
+  if(!activos.length){ grid.innerHTML='<div style="color:#aaa;font-size:13px">Sin datos aún</div>'; return; }
+  grid.innerHTML=activos.map(k=>{
+    const total=recRows.filter(r=>r.kavako===k).length;
+    const llamados=recRows.filter(r=>r.kavako===k&&r.llamado).length;
+    const pct=total>0?Math.round(llamados/total*100):0;
+    const color=pct>=80?'#1D9E75':pct>=50?'#F59E0B':'#EF4444';
+    const bgColor=pct>=80?'#D6F5E8':pct>=50?'#FFF0D6':'#FFE0E0';
+    return`<div style="background:#fff;border:1px solid #e2e4ec;border-radius:10px;padding:10px 12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:12px;font-weight:600;color:#1a1a2e">${k}</span>
+        <span style="font-size:13px;font-weight:700;color:${color};background:${bgColor};padding:2px 8px;border-radius:6px">${pct}%</span>
+      </div>
+      <div style="height:5px;background:#e2e4ec;border-radius:3px;overflow:hidden;margin-bottom:5px">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width .3s"></div>
+      </div>
+      <div style="font-size:11px;color:#8a8fa8">${llamados} de ${total} llamados</div>
+    </div>`;
+  }).join('');
+}
+
+function updateKpis(){
+  const tot=recRows.length,llam=recRows.filter(r=>r.llamado).length;
+  const pct=tot>0?Math.round(llam/tot*100):0;
+  document.getElementById('rk-pend').textContent=tot-llam;
+  document.getElementById('rk-llam').textContent=llam;
+  document.getElementById('rk-tot').textContent=tot;
+  document.getElementById('rk-pct').textContent=pct+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-txt').textContent=`${llam} de ${tot} contactados`;
+  updateKavakosGrid();
+  updateSelectKavako();
+}
+
+function renderRec(){
+  updateKpis();
+  const empty=document.getElementById('rec-empty'),tbody=document.getElementById('rec-body');
+  const filtroKavako=(document.getElementById('filtro-kavako')||{}).value||'';
+  let rows=[...recRows];
+  if(filtro==='pendiente')rows=rows.filter(r=>!r.llamado);
+  else if(filtro==='llamado')rows=rows.filter(r=>r.llamado);
+  else if(filtro==='cita')rows=rows.filter(r=>r.tipo==='cita');
+  else if(filtro==='organico')rows=rows.filter(r=>r.tipo==='organico');
+  if(filtroKavako) rows=rows.filter(r=>r.kavako===filtroKavako);
+  rows.sort((a,b)=>Number(a.llamado)-Number(b.llamado)||a.cliente.localeCompare(b.cliente));
+  if(!recRows.length){empty.style.display='block';tbody.innerHTML='';return;}
+  empty.style.display='none';
+  const kavakosOpts=getKavakosActivos().map(k=>`<option value="${k}">${k}</option>`).join('');
+  tbody.innerHTML=rows.map(r=>{
+    const tB=r.tipo==='cita'
+      ?'<span class="badge bc">Cita</span>'
+      :'<span class="badge bo">Orgánico</span>';
+    const telH=r.tel
+      ?`<a class="tel" href="tel:${r.tel}">${r.tel}</a>`
+      :`<span style="color:#c8cbd8;font-size:12px">Sin tel.</span>`;
+    // Columna "Llamado por": si ya llamó muestra badge con nombre; si no, muestra dropdown para asignarse
+    const quienHtml=r.llamado && r.llamadoPor
+      ?`<div style="display:flex;flex-direction:column;gap:3px">
+          <div class="quien-llamo">✓ ${r.llamadoPor}<span style="font-size:10px;opacity:.7;margin-left:4px">${r.llamadoTs||''}</span></div>
+          <button onclick="desmarcarLlam(${r.id})" style="font-size:10px;color:#8a8fa8;background:none;border:none;cursor:pointer;text-align:left;padding:0">↩ Desmarcar</button>
+        </div>`
+      :`<select class="sel-llamador" data-id="${r.id}" onchange="asignarLlamador(${r.id},this.value)"
+          style="font-size:12px;border:1px solid #d8dae6;border-radius:7px;padding:4px 8px;background:#fff;color:#1a1a2e;cursor:pointer;font-family:inherit;width:100%">
+          <option value="">— Yo llamé —</option>
+          ${kavakosOpts}
+        </select>`;
+    return`<tr class="${r.llamado?'ok':''}">
+      <td><div style="font-size:13px;font-weight:600">${r.cliente}</div><div style="font-size:11px;color:#8a8fa8">${r.fecha}</div></td>
+      <td>${telH}</td>
+      <td>${tB}</td>
+      <td><span class="kname">${r.kavako}</span></td>
+      <td>${quienHtml}</td>
+      <td><span class="mot-tag" title="${r.motivo}">${r.motivo}</span></td>
+      <td><textarea class="ci" rows="1" data-id="${r.id}" placeholder="Notas de la llamada..." onchange="setNota(${r.id},this.value)" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,64)+'px'">${r.nota}</textarea></td>
+      <td style="text-align:center">
+        <button class="ck${r.llamado?' on':''}" onclick="toggleLlam(${r.id})" title="${r.llamado?'Desmarcar':'Confirmar llamada realizada'}">
+          <span class="ico">✓</span>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── DATOS HISTÓRICOS PRECARGADOS — calculados del sheet real ──
+(function(){
+  const datosXDia = [
+    {fecha:"06/04",all:25,allRes:7,citas:4,citasRes:1,orgs:8,orgsRes:6,segs:8,
+     cNR:[
+       {cliente:"marco flores",kavako:"Jenifer Hernandez",apartado:"En consideración",comentario:"Perfilamiento rechazado",tel:"525560668685"},
+       {cliente:"victor lópez",kavako:"Gabriela Sanchez",apartado:"",comentario:"",tel:"527224443475"},
+       {cliente:"maría fernanda sepulveda",kavako:"Jenifer Hernandez",apartado:"",comentario:"",tel:"525580443400"},
+     ],
+     oNR:[
+       {cliente:"edgar abraham peregrino",kavako:"Oscar Longines",apartado:"",comentario:"SIN REGISTRO EN CLAIOS",tel:"525641029659"},
+       {cliente:"Alex",kavako:"Gabriela Sanchez",apartado:"",comentario:"CITA PERFIL CON DATOS ALTERNOS",tel:"525611803125"},
+     ],
+     recNR:[
+       {cliente:"marco flores",tel:"525560668685",tipo:"cita",kavako:"Jenifer Hernandez",motivo:"Perfil rechazado",fecha:"06/04"},
+       {cliente:"victor lópez",tel:"527224443475",tipo:"cita",kavako:"Gabriela Sanchez",motivo:"Sin motivo registrado",fecha:"06/04"},
+       {cliente:"maría fernanda sepulveda",tel:"525580443400",tipo:"cita",kavako:"Jenifer Hernandez",motivo:"Sin motivo registrado",fecha:"06/04"},
+       {cliente:"edgar abraham peregrino",tel:"525641029659",tipo:"organico",kavako:"Oscar Longines",motivo:"Sin motivo registrado",fecha:"06/04"},
+       {cliente:"Alex",tel:"525611803125",tipo:"organico",kavako:"Gabriela Sanchez",motivo:"Sin motivo registrado",fecha:"06/04"},
+     ]},
+    {fecha:"08/04",all:24,allRes:8,citas:4,citasRes:4,orgs:5,orgsRes:4,segs:9,
+     cNR:[],
+     oNR:[
+       {cliente:"aranthxa vargas",kavako:"Brandon Jarquinmartinez",apartado:"",comentario:"ORGANICO",tel:"525624449999"},
+     ],
+     recNR:[
+       {cliente:"aranthxa vargas",tel:"525624449999",tipo:"organico",kavako:"Brandon Jarquinmartinez",motivo:"Sin motivo registrado",fecha:"08/04"},
+     ]},
+    {fecha:"09/04",all:24,allRes:7,citas:3,citasRes:3,orgs:5,orgsRes:2,segs:9,
+     cNR:[],
+     oNR:[
+       {cliente:"nidia gutierrez",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525612602879"},
+       {cliente:"issac cayetano",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525537187286"},
+       {cliente:"Miguel Angel Asiain",kavako:"Brandon Jarquinmartinez",apartado:"En consideración",comentario:"Perfil rechazado",tel:"527716991437"},
+     ],
+     recNR:[
+       {cliente:"nidia gutierrez",tel:"525612602879",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"09/04"},
+       {cliente:"issac cayetano",tel:"525537187286",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"09/04"},
+       {cliente:"Miguel Angel Asiain",tel:"527716991437",tipo:"organico",kavako:"Brandon Jarquinmartinez",motivo:"Perfil rechazado",fecha:"09/04"},
+     ]},
+    {fecha:"11/04",all:41,allRes:5,citas:12,citasRes:4,orgs:10,orgsRes:1,segs:12,
+     cNR:[
+       {cliente:"daniel baruch",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525550459774"},
+       {cliente:"enrique ortega",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525579064892"},
+       {cliente:"maria gallegos",kavako:"Gabriela Sanchez",apartado:"En consideración",comentario:"quiere juntar mas dinero para el enganche",tel:"525520106062"},
+       {cliente:"ruben lopez",kavako:"Francisco Ramirez",apartado:"En consideración",comentario:"vuelve mañana para apartar",tel:"525561285552"},
+       {cliente:"victor gallardo",kavako:"Francisco Ramirez",apartado:"En consideración",comentario:"checa cotizaciones",tel:"525634613254"},
+       {cliente:"RICARDO SALDAÑA",kavako:"Dionicio Luiz",apartado:"En consideración",comentario:"no es el titular del financiamiento",tel:"697987080900"},
+       {cliente:"cynthia muñoz",kavako:"Brandon Jarquinmartinez",apartado:"Sin interés de compra",comentario:"quiere coche con temas mecanicos",tel:"525588297756"},
+       {cliente:"diego muñoz solis",kavako:"Jenifer Hernandez",apartado:"",comentario:"",tel:"525586015653"},
+     ],
+     oNR:[
+       {cliente:"jose juan gutierrez",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525561451607"},
+       {cliente:"Cristian Rivera",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525633427649"},
+       {cliente:"carlos villaseñor",kavako:"Sin asignar",apartado:"",comentario:"no tiene carros en particular",tel:"525541353139"},
+       {cliente:"luis davalos",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525613847818"},
+       {cliente:"brayan pelcastre",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525611063739"},
+       {cliente:"betzabet perea",kavako:"Francisco Ramirez",apartado:"No cuenta con el presupuesto",comentario:"solo vino a ver opciones para futura compra en mayo",tel:"525549121033"},
+       {cliente:"momi jeans moa",kavako:"Dionicio Luiz",apartado:"Sin interés de compra",comentario:"no le convencio ninguna unidad",tel:"525610416532"},
+       {cliente:"Cristian Rivera2",kavako:"Brandon Jarquinmartinez",apartado:"En consideración",comentario:"trading esperando espacios",tel:"525633427649"},
+       {cliente:"fernanda aceves",kavako:"Dionicio Luiz",apartado:"No cuenta con el presupuesto",comentario:"pago contado sin total del dinero",tel:"525614497506"},
+     ],
+     recNR:[
+       {cliente:"daniel baruch",tel:"525550459774",tipo:"cita",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"11/04"},
+       {cliente:"enrique ortega",tel:"525579064892",tipo:"cita",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"11/04"},
+       {cliente:"maria gallegos",tel:"525520106062",tipo:"cita",kavako:"Gabriela Sanchez",motivo:"Sin presupuesto / enganche",fecha:"11/04"},
+       {cliente:"ruben lopez",tel:"525561285552",tipo:"cita",kavako:"Francisco Ramirez",motivo:"Pospone decisión",fecha:"11/04"},
+       {cliente:"victor gallardo",tel:"525634613254",tipo:"cita",kavako:"Francisco Ramirez",motivo:"Condiciones / precio / tasa",fecha:"11/04"},
+       {cliente:"RICARDO SALDAÑA",tel:"697987080900",tipo:"cita",kavako:"Dionicio Luiz",motivo:"En consideración",fecha:"11/04"},
+       {cliente:"cynthia muñoz",tel:"525588297756",tipo:"cita",kavako:"Brandon Jarquinmartinez",motivo:"Solo vino a informarse",fecha:"11/04"},
+       {cliente:"diego muñoz solis",tel:"525586015653",tipo:"cita",kavako:"Jenifer Hernandez",motivo:"Sin motivo registrado",fecha:"11/04"},
+       {cliente:"jose juan gutierrez",tel:"525561451607",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"11/04"},
+       {cliente:"Cristian Rivera",tel:"525633427649",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"11/04"},
+       {cliente:"carlos villaseñor",tel:"525541353139",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"11/04"},
+       {cliente:"luis davalos",tel:"525613847818",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"11/04"},
+       {cliente:"brayan pelcastre",tel:"525611063739",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"11/04"},
+       {cliente:"betzabet perea",tel:"525549121033",tipo:"organico",kavako:"Francisco Ramirez",motivo:"Sin presupuesto / enganche",fecha:"11/04"},
+       {cliente:"momi jeans moa",tel:"525610416532",tipo:"organico",kavako:"Dionicio Luiz",motivo:"Solo vino a informarse",fecha:"11/04"},
+       {cliente:"fernanda aceves",tel:"525614497506",tipo:"organico",kavako:"Dionicio Luiz",motivo:"Sin presupuesto / enganche",fecha:"11/04"},
+     ]},
+    {fecha:"15/04",all:48,allRes:12,citas:4,citasRes:4,orgs:20,orgsRes:8,segs:14,
+     cNR:[],
+     oNR:[
+       {cliente:"serapio silva",kavako:"Oscar Longines",apartado:"En consideración",comentario:"No es el titular solo viene a ver opciones",tel:"525546526420"},
+       {cliente:"victor muñoz",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525539747794"},
+       {cliente:"nieves chacón",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525587979507"},
+       {cliente:"pablo salazar",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525549057229"},
+       {cliente:"andrea herrera",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525565411589"},
+       {cliente:"rafael martinez",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525545480388"},
+       {cliente:"victor martínez",kavako:"Sin asignar",apartado:"",comentario:"",tel:"527202235147"},
+       {cliente:"jose hernandez",kavako:"Oscar Longines",apartado:"",comentario:"NO SE PERFILA",tel:"525610204682"},
+       {cliente:"belen campos",kavako:"Ivan Covarrubias",apartado:"Sin interés de compra",comentario:"Perfil rechazado",tel:"525563366709"},
+       {cliente:"Israel Rodríguez",kavako:"Brandon Jarquinmartinez",apartado:"No cuenta con el presupuesto",comentario:"No contemplaba tarifa de servicio",tel:"525543133242"},
+       {cliente:"cla es",kavako:"Sin asignar",apartado:"",comentario:"DATOS ALTERNOS PERFIL X",tel:"525528943414"},
+       {cliente:"Geovanny Gomez",kavako:"Oscar Longines",apartado:"En consideración",comentario:"Solo ver opciones",tel:"525513115617"},
+     ],
+     recNR:[
+       {cliente:"serapio silva",tel:"525546526420",tipo:"organico",kavako:"Oscar Longines",motivo:"Pospone decisión",fecha:"15/04"},
+       {cliente:"victor muñoz",tel:"525539747794",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"15/04"},
+       {cliente:"nieves chacón",tel:"525587979507",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"15/04"},
+       {cliente:"pablo salazar",tel:"525549057229",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"15/04"},
+       {cliente:"andrea herrera",tel:"525565411589",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"15/04"},
+       {cliente:"rafael martinez",tel:"525545480388",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"15/04"},
+       {cliente:"victor martínez",tel:"527202235147",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"15/04"},
+       {cliente:"jose hernandez",tel:"525610204682",tipo:"organico",kavako:"Oscar Longines",motivo:"Sin motivo registrado",fecha:"15/04"},
+       {cliente:"belen campos",tel:"525563366709",tipo:"organico",kavako:"Ivan Covarrubias",motivo:"Perfil rechazado",fecha:"15/04"},
+       {cliente:"Israel Rodríguez",tel:"525543133242",tipo:"organico",kavako:"Brandon Jarquinmartinez",motivo:"Sin presupuesto / enganche",fecha:"15/04"},
+       {cliente:"cla es",tel:"525528943414",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"15/04"},
+       {cliente:"Geovanny Gomez",tel:"525513115617",tipo:"organico",kavako:"Oscar Longines",motivo:"Solo vino a informarse",fecha:"15/04"},
+     ]},
+    {fecha:"19/04",all:27,allRes:4,citas:7,citasRes:3,orgs:16,orgsRes:1,segs:4,
+     cNR:[
+       {cliente:"Jorge Armando",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525575189484"},
+       {cliente:"erick consuelo",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525535146252"},
+       {cliente:"victor mariano alviso",kavako:"Sin asignar",apartado:"",comentario:"",tel:"524621767162"},
+       {cliente:"ernesto gamero",kavako:"Sin asignar",apartado:"En consideración",comentario:"busca financiamiento renault",tel:"525625168996"},
+     ],
+     oNR:[
+       {cliente:"julio valdéz",kavako:"Dionicio Luiz",apartado:"No cuenta con el presupuesto",comentario:"PERFIL RECHAZADO",tel:"525568165395"},
+       {cliente:"aaron alejandre",kavako:"Sin asignar",apartado:"",comentario:"DATOS ALTERNOS",tel:"525255634906"},
+       {cliente:"oziel mera",kavako:"Dionicio Luiz",apartado:"No cuenta con el presupuesto",comentario:"2 creditos automotrices activos",tel:"525554681687"},
+       {cliente:"michelle alvarado",kavako:"Brandon Jarquinmartinez",apartado:"En consideración",comentario:"Flag situacion fiscal",tel:"525624054641"},
+       {cliente:"angel esparza",kavako:"Brandon Jarquinmartinez",apartado:"Sólo vino a conocer",comentario:"No fue posible agenda",tel:"525591855472"},
+       {cliente:"Eridani Vazquez",kavako:"Sin asignar",apartado:"",comentario:"BUSCA PICK UP",tel:"525548647548"},
+       {cliente:"Axel Dupont",kavako:"Sin asignar",apartado:"En consideración",comentario:"Esperando dinero 13.05",tel:"525255195680"},
+       {cliente:"ROBERTO MIRANDA",kavako:"Sin asignar",apartado:"En consideración",comentario:"Faltan 15K para enganche",tel:"525537272736"},
+       {cliente:"eden garcia",kavako:"Sin asignar",apartado:"No cuenta con el presupuesto",comentario:"compra a mitad de mes",tel:"525535513076"},
+       {cliente:"jorge hernandez",kavako:"Sin asignar",apartado:"",comentario:"NO LE AGRADA TASA",tel:"525560914783"},
+       {cliente:"erik cerezo",kavako:"Sin asignar",apartado:"",comentario:"",tel:"525541775852"},
+       {cliente:"Diego Gonzalez",kavako:"Sin asignar",apartado:"",comentario:"ORGANICO DATOS ALTERNOS",tel:"525534377697"},
+       {cliente:"francisco medel",kavako:"Sin asignar",apartado:"No cuenta con el presupuesto",comentario:"perfilamiento rechazado ingresos bajos",tel:"525611091319"},
+       {cliente:"marlene mercado",kavako:"Sin asignar",apartado:"",comentario:"PERFILADA EN HUB",tel:"525563184888"},
+       {cliente:"Maribel Valle",kavako:"Samuel Rodriguez",apartado:"No cuenta con el presupuesto",comentario:"compra a final de mes",tel:"525533329140"},
+     ],
+     recNR:[
+       {cliente:"Jorge Armando",tel:"525575189484",tipo:"cita",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"19/04"},
+       {cliente:"erick consuelo",tel:"525535146252",tipo:"cita",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"19/04"},
+       {cliente:"victor mariano alviso",tel:"524621767162",tipo:"cita",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"19/04"},
+       {cliente:"ernesto gamero",tel:"525625168996",tipo:"cita",kavako:"Sin asignar",motivo:"En consideración",fecha:"19/04"},
+       {cliente:"julio valdéz",tel:"525568165395",tipo:"organico",kavako:"Dionicio Luiz",motivo:"Perfil rechazado",fecha:"19/04"},
+       {cliente:"aaron alejandre",tel:"525255634906",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"19/04"},
+       {cliente:"oziel mera",tel:"525554681687",tipo:"organico",kavako:"Dionicio Luiz",motivo:"Perfil rechazado",fecha:"19/04"},
+       {cliente:"michelle alvarado",tel:"525624054641",tipo:"organico",kavako:"Brandon Jarquinmartinez",motivo:"En consideración",fecha:"19/04"},
+       {cliente:"angel esparza",tel:"525591855472",tipo:"organico",kavako:"Brandon Jarquinmartinez",motivo:"Solo vino a informarse",fecha:"19/04"},
+       {cliente:"Eridani Vazquez",tel:"525548647548",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"19/04"},
+       {cliente:"Axel Dupont",tel:"525255195680",tipo:"organico",kavako:"Sin asignar",motivo:"Pospone decisión",fecha:"19/04"},
+       {cliente:"ROBERTO MIRANDA",tel:"525537272736",tipo:"organico",kavako:"Sin asignar",motivo:"Sin presupuesto / enganche",fecha:"19/04"},
+       {cliente:"eden garcia",tel:"525535513076",tipo:"organico",kavako:"Sin asignar",motivo:"Sin presupuesto / enganche",fecha:"19/04"},
+       {cliente:"jorge hernandez",tel:"525560914783",tipo:"organico",kavako:"Sin asignar",motivo:"Condiciones / precio / tasa",fecha:"19/04"},
+       {cliente:"erik cerezo",tel:"525541775852",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"19/04"},
+       {cliente:"Diego Gonzalez",tel:"525534377697",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"19/04"},
+       {cliente:"francisco medel",tel:"525611091319",tipo:"organico",kavako:"Sin asignar",motivo:"Perfil rechazado",fecha:"19/04"},
+       {cliente:"marlene mercado",tel:"525563184888",tipo:"organico",kavako:"Sin asignar",motivo:"Sin motivo registrado",fecha:"19/04"},
+       {cliente:"Maribel Valle",tel:"525533329140",tipo:"organico",kavako:"Samuel Rodriguez",motivo:"Sin presupuesto / enganche",fecha:"19/04"},
+     ]},
+    {fecha:"20/04",all:31,allRes:6,citas:4,citasRes:3,orgs:3,orgsRes:1,segs:18,
+     cNR:[
+       {cliente:"javier montaño",kavako:"Francisco Ramirez",apartado:"Sin interés de compra",comentario:"Solo conocer procesos de inspeccion y financiamiento",tel:"525554188755"},
+     ],
+     oNR:[
+       {cliente:"viridiana lopez",kavako:"Oscar Longines",apartado:"En consideración",comentario:"mejor tasa en agencia sin comision apertura",tel:"525537142794"},
+       {cliente:"edgar suarez",kavako:"Oscar Longines",apartado:"En consideración",comentario:"quiere platicarlo con su papa",tel:"525532328545"},
+     ],
+     recNR:[
+       {cliente:"javier montaño",tel:"525554188755",tipo:"cita",kavako:"Francisco Ramirez",motivo:"Solo vino a informarse",fecha:"20/04"},
+       {cliente:"viridiana lopez",tel:"525537142794",tipo:"organico",kavako:"Oscar Longines",motivo:"Condiciones / precio / tasa",fecha:"20/04"},
+       {cliente:"edgar suarez",tel:"525532328545",tipo:"organico",kavako:"Oscar Longines",motivo:"Pospone decisión",fecha:"20/04"},
+     ]},
+    {fecha:"22/04",all:32,allRes:4,citas:4,citasRes:2,orgs:8,orgsRes:2,segs:14,
+     cNR:[
+       {cliente:"roman estrada",kavako:"Brandon Jarquinmartinez",apartado:"En consideración",comentario:"estrategia fiscal para facturar el coche",tel:"527351027319"},
+       {cliente:"thelma andrade",kavako:"Brandon Jarquinmartinez",apartado:"Sin interés de compra",comentario:"No es el titular la compra en mayo",tel:"524424827510"},
+     ],
+     oNR:[
+       {cliente:"ángel armando",kavako:"Oscar Longines",apartado:"",comentario:"ORGANICO",tel:"525523429064"},
+       {cliente:"gustavo melendez",kavako:"Oscar Longines",apartado:"En consideración",comentario:"vino a ver opciones para cambio de auto",tel:"525568178698"},
+       {cliente:"fernanda del valle",kavako:"Oscar Longines",apartado:"No cuenta con el presupuesto",comentario:"continua viendo opciones",tel:"525534952014"},
+       {cliente:"nidya petersen",kavako:"Brandon Jarquinmartinez",apartado:"Sin interés de compra",comentario:"solo vino por informes",tel:"525562064704"},
+       {cliente:"gabriela corona",kavako:"Jenifer Hernandez",apartado:"Sin interés de compra",comentario:"aun no tiene dinero",tel:"525434236854"},
+       {cliente:"jesenet cortes",kavako:"Brandon Jarquinmartinez",apartado:"En consideración",comentario:"No contempló tarifa de servicio",tel:"525565118238"},
+     ],
+     recNR:[
+       {cliente:"roman estrada",tel:"527351027319",tipo:"cita",kavako:"Brandon Jarquinmartinez",motivo:"En consideración",fecha:"22/04"},
+       {cliente:"thelma andrade",tel:"524424827510",tipo:"cita",kavako:"Brandon Jarquinmartinez",motivo:"Pospone decisión",fecha:"22/04"},
+       {cliente:"ángel armando",tel:"525523429064",tipo:"organico",kavako:"Oscar Longines",motivo:"Sin motivo registrado",fecha:"22/04"},
+       {cliente:"gustavo melendez",tel:"525568178698",tipo:"organico",kavako:"Oscar Longines",motivo:"Solo vino a informarse",fecha:"22/04"},
+       {cliente:"fernanda del valle",tel:"525534952014",tipo:"organico",kavako:"Oscar Longines",motivo:"Sin presupuesto / enganche",fecha:"22/04"},
+       {cliente:"nidya petersen",tel:"525562064704",tipo:"organico",kavako:"Brandon Jarquinmartinez",motivo:"Solo vino a informarse",fecha:"22/04"},
+       {cliente:"gabriela corona",tel:"525434236854",tipo:"organico",kavako:"Jenifer Hernandez",motivo:"Solo vino a informarse",fecha:"22/04"},
+       {cliente:"jesenet cortes",tel:"525565118238",tipo:"organico",kavako:"Brandon Jarquinmartinez",motivo:"En consideración",fecha:"22/04"},
+     ]},
+    {fecha:"24/04",all:32,allRes:7,citas:3,citasRes:1,orgs:10,orgsRes:4,segs:10,
+     cNR:[
+       {cliente:"erick martinez",kavako:"Brandon Jarquinmartinez",apartado:"",comentario:"ver autos en general perfil x",tel:"525548490261"},
+       {cliente:"ricardo sanchez",kavako:"Samuel Rodriguez",apartado:"No cuenta con el presupuesto",comentario:"Enganche superior, tiene autofinanciamiento, tasa muy alta",tel:"525632546301"},
+     ],
+     oNR:[
+       {cliente:"alberto vela",kavako:"Jenifer Hernandez",apartado:"En consideración",comentario:"estan revisando opciones",tel:"525525635937"},
+       {cliente:"efrain martinez",kavako:"Francisco Ramirez",apartado:"Sin interés de compra",comentario:"no encontro auto que se adaptara a lo que busca",tel:"527121895750"},
+       {cliente:"sergio aquino",kavako:"Jenifer Hernandez",apartado:"En consideración",comentario:"solo venian a ver",tel:"525537133268"},
+       {cliente:"jorge espinoza",kavako:"Jenifer Hernandez",apartado:"Sin interés de compra",comentario:"quiere ver mas autos en santafe",tel:"525580507756"},
+       {cliente:"armando miguel",kavako:"Dionicio Luiz",apartado:"En consideración",comentario:"puede volver el dia de mañana",tel:"525543275843"},
+       {cliente:"ana guerrero",kavako:"Brandon Jarquinmartinez",apartado:"",comentario:"ORGANICO PERFILADO",tel:"525519511050"},
+     ],
+     recNR:[
+       {cliente:"erick martinez",tel:"525548490261",tipo:"cita",kavako:"Brandon Jarquinmartinez",motivo:"Sin motivo registrado",fecha:"24/04"},
+       {cliente:"ricardo sanchez",tel:"525632546301",tipo:"cita",kavako:"Samuel Rodriguez",motivo:"Sin presupuesto / enganche",fecha:"24/04"},
+       {cliente:"alberto vela",tel:"525525635937",tipo:"organico",kavako:"Jenifer Hernandez",motivo:"En consideración",fecha:"24/04"},
+       {cliente:"efrain martinez",tel:"527121895750",tipo:"organico",kavako:"Francisco Ramirez",motivo:"Solo vino a informarse",fecha:"24/04"},
+       {cliente:"sergio aquino",tel:"525537133268",tipo:"organico",kavako:"Jenifer Hernandez",motivo:"Solo vino a informarse",fecha:"24/04"},
+       {cliente:"jorge espinoza",tel:"525580507756",tipo:"organico",kavako:"Jenifer Hernandez",motivo:"Solo vino a informarse",fecha:"24/04"},
+       {cliente:"armando miguel",tel:"525543275843",tipo:"organico",kavako:"Dionicio Luiz",motivo:"Pospone decisión",fecha:"24/04"},
+       {cliente:"ana guerrero",tel:"525519511050",tipo:"organico",kavako:"Brandon Jarquinmartinez",motivo:"Sin motivo registrado",fecha:"24/04"},
+     ]},
+  ];
+
+  // Construir diasHistorial y recRows desde los datos precargados
+  datosXDia.forEach(d=>{
+    const cNR = d.cNR.map(r=>({
+      ...r, calificacion:'cita', tel:r.tel||'',
+      correo:r.correo||'—', stock:r.stock||'',
+      motivoCalculado: getMot(r.apartado||'', r.comentario||'')
+    }));
+    const oNR = d.oNR.map(r=>({
+      ...r, calificacion:'organico', tel:r.tel||'',
+      correo:r.correo||'—', stock:r.stock||'',
+      motivoCalculado: getMot(r.apartado||'', r.comentario||'')
+    }));
+    const v2bGen = d.all>0?(d.allRes/d.all*100):0;
+    const v2bC   = d.citas>0?(d.citasRes/d.citas*100):0;
+    const v2bO   = d.orgs>0?(d.orgsRes/d.orgs*100):0;
+    diasHistorial.push({
+      fecha:d.fecha, all:d.all, allRes:d.allRes,
+      citas:d.citas, citasRes:d.citasRes,
+      orgs:d.orgs,   orgsRes:d.orgsRes,
+      segs:d.segs,   v2bGen, v2bC, v2bO,
+      cNR, oNR,
+      mCita:calcM(cNR), mOrg:calcM(oNR),
+      feed:genFeed(cNR,oNR,v2bGen,v2bC,v2bO)
+    });
+    // Poblar recovery — solo clientes convertibles
+    d.recNR.forEach((r,i)=>{
+      if(!esConvertible(r.motivo)) return; // descartar no convertibles
+      recRows.push({
+        id: parseFloat(d.fecha.replace('/','')+''+i),
+        cliente:r.cliente, tel:r.tel||'',
+        tipo:r.tipo, kavako:r.kavako,
+        motivo:r.motivo, llamado:false, nota:'', fecha:r.fecha
+      });
+    });
+  });
+})();
+
+renderDias();
+renderRec();
+</script>
+</div>
+</body>
+</html>
